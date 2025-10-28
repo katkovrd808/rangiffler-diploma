@@ -1,0 +1,3 @@
+rootProject.name = 'rangiffler-diploma'
+include 'rangiffler-gateway'
+include 'rangiffler-auth'

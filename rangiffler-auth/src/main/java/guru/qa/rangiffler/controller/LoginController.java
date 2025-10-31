@@ -24,7 +24,7 @@ public class LoginController {
 
   @GetMapping("/login")
   public String login(HttpSession session) {
-    if (sessionValidator.isWebOauthSession(session) || sessionValidator.isAndroidOauthSession(session)) {
+    if (sessionValidator.isWebOauthSession(session)) {
       return LOGIN_VIEW_NAME;
     }
     return "redirect:" + rangifflerFrontUri;

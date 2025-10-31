@@ -1,108 +1,113 @@
-create table if not exists `user`
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'authority_enum') THEN
+        CREATE TYPE authority_enum AS ENUM ('read', 'write');
+    END IF;
+END$$;
+
+CREATE TABLE IF NOT EXISTS "user"
 (
-    id                      binary(16) unique  not null default (UUID_TO_BIN(UUID(), true)),
-    username                varchar(50) unique not null,
-    password                varchar(255)       not null,
-    enabled                 boolean            not null,
-    account_non_expired     boolean            not null,
-    account_non_locked      boolean            not null,
-    credentials_non_expired boolean            not null,
-    primary key (id, username)
+    id                      uuid PRIMARY KEY DEFAULT uuid_generate_v1(),
+    username                varchar(50) UNIQUE NOT NULL,
+    password                varchar(255)       NOT NULL,
+    enabled                 boolean            NOT NULL,
+    account_non_expired     boolean            NOT NULL,
+    account_non_locked      boolean            NOT NULL,
+    credentials_non_expired boolean            NOT NULL
 );
 
-create table if not exists `authority`
+CREATE TABLE IF NOT EXISTS "authority"
 (
-    id        binary(16) unique      not null default (UUID_TO_BIN(UUID(), true)),
-    user_id   binary(16)             not null,
-    authority enum ('read', 'write') not null,
-    primary key (id),
-    constraint fk_authorities_users foreign key (user_id) references `user` (id)
+    id        uuid PRIMARY KEY DEFAULT uuid_generate_v1(),
+    user_id   uuid NOT NULL REFERENCES "user" (id),
+    authority authority_enum NOT NULL
 );
 
-create table if not exists `oauth2_registered_client`
+CREATE TABLE IF NOT EXISTS "oauth2_registered_client"
 (
-    id                            varchar(100)                            NOT NULL,
-    client_id                     varchar(100)                            NOT NULL,
+    id                            varchar(100)  NOT NULL PRIMARY KEY,
+    client_id                     varchar(100)  NOT NULL,
     client_id_issued_at           timestamp     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    client_secret                 varchar(200)  DEFAULT NULL,
-    client_secret_expires_at      timestamp     DEFAULT NULL,
-    client_name                   varchar(200)                            NOT NULL,
-    client_authentication_methods varchar(1000)                           NOT NULL,
-    authorization_grant_types     varchar(1000)                           NOT NULL,
-    redirect_uris                 varchar(1000) DEFAULT NULL,
-    post_logout_redirect_uris     varchar(1000) DEFAULT NULL,
-    scopes                        varchar(1000)                           NOT NULL,
-    client_settings               varchar(2000)                           NOT NULL,
-    token_settings                varchar(2000)                           NOT NULL,
-    PRIMARY KEY (id)
+    client_secret                 varchar(200),
+    client_secret_expires_at      timestamp,
+    client_name                   varchar(200)  NOT NULL,
+    client_authentication_methods varchar(1000) NOT NULL,
+    authorization_grant_types     varchar(1000) NOT NULL,
+    redirect_uris                 varchar(1000),
+    post_logout_redirect_uris     varchar(1000),
+    scopes                        varchar(1000) NOT NULL,
+    client_settings               text NOT NULL,
+    token_settings                text NOT NULL
 );
 
-create table if not exists `oauth2_authorization_consent`
+CREATE TABLE IF NOT EXISTS "oauth2_authorization_consent"
 (
-    registered_client_id varchar(100)  NOT NULL,
-    principal_name       varchar(200)  NOT NULL,
+    registered_client_id varchar(100) NOT NULL,
+    principal_name       varchar(200) NOT NULL,
     authorities          varchar(1000) NOT NULL,
     PRIMARY KEY (registered_client_id, principal_name)
 );
 
-create table if not exists `oauth2_authorization`
+CREATE TABLE IF NOT EXISTS "oauth2_authorization"
 (
-    id                            varchar(100) NOT NULL,
+    id                            varchar(100) PRIMARY KEY,
     registered_client_id          varchar(100) NOT NULL,
     principal_name                varchar(200) NOT NULL,
     authorization_grant_type      varchar(100) NOT NULL,
-    authorized_scopes             varchar(1000) DEFAULT NULL,
-    attributes                    longtext          DEFAULT NULL,
-    state                         varchar(500)  DEFAULT NULL,
-    authorization_code_value      longtext          DEFAULT NULL,
-    authorization_code_issued_at  timestamp     DEFAULT NULL,
-    authorization_code_expires_at timestamp     DEFAULT NULL,
-    authorization_code_metadata   longtext          DEFAULT NULL,
-    access_token_value            longtext          DEFAULT NULL,
-    access_token_issued_at        timestamp     DEFAULT NULL,
-    access_token_expires_at       timestamp     DEFAULT NULL,
-    access_token_metadata         longtext          DEFAULT NULL,
-    access_token_type             varchar(100)  DEFAULT NULL,
-    access_token_scopes           varchar(1000) DEFAULT NULL,
-    oidc_id_token_value           longtext          DEFAULT NULL,
-    oidc_id_token_issued_at       timestamp     DEFAULT NULL,
-    oidc_id_token_expires_at      timestamp     DEFAULT NULL,
-    oidc_id_token_metadata        longtext          DEFAULT NULL,
-    refresh_token_value           longtext          DEFAULT NULL,
-    refresh_token_issued_at       timestamp     DEFAULT NULL,
-    refresh_token_expires_at      timestamp     DEFAULT NULL,
-    refresh_token_metadata        longtext          DEFAULT NULL,
-    user_code_value               longtext          DEFAULT NULL,
-    user_code_issued_at           timestamp     DEFAULT NULL,
-    user_code_expires_at          timestamp     DEFAULT NULL,
-    user_code_metadata            longtext          DEFAULT NULL,
-    device_code_value             longtext          DEFAULT NULL,
-    device_code_issued_at         timestamp     DEFAULT NULL,
-    device_code_expires_at        timestamp     DEFAULT NULL,
-    device_code_metadata          longtext          DEFAULT NULL,
-    PRIMARY KEY (id)
+    authorized_scopes             varchar(1000),
+    attributes                    text,
+    state                         varchar(500),
+    authorization_code_value      text,
+    authorization_code_issued_at  timestamp,
+    authorization_code_expires_at timestamp,
+    authorization_code_metadata   text,
+    access_token_value            text,
+    access_token_issued_at        timestamp,
+    access_token_expires_at       timestamp,
+    access_token_metadata         text,
+    access_token_type             varchar(100),
+    access_token_scopes           varchar(1000),
+    oidc_id_token_value           text,
+    oidc_id_token_issued_at       timestamp,
+    oidc_id_token_expires_at      timestamp,
+    oidc_id_token_metadata        text,
+    refresh_token_value           text,
+    refresh_token_issued_at       timestamp,
+    refresh_token_expires_at      timestamp,
+    refresh_token_metadata        text,
+    user_code_value               text,
+    user_code_issued_at           timestamp,
+    user_code_expires_at          timestamp,
+    user_code_metadata            text,
+    device_code_value             text,
+    device_code_issued_at         timestamp,
+    device_code_expires_at        timestamp,
+    device_code_metadata          text
 );
 
-create table if not exists `SPRING_SESSION` (
-                                PRIMARY_ID CHAR(36) NOT NULL,
-                                SESSION_ID CHAR(36) NOT NULL,
-                                CREATION_TIME BIGINT NOT NULL,
-                                LAST_ACCESS_TIME BIGINT NOT NULL,
-                                MAX_INACTIVE_INTERVAL INT NOT NULL,
-                                EXPIRY_TIME BIGINT NOT NULL,
-                                PRINCIPAL_NAME VARCHAR(100),
-                                CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
+CREATE TABLE IF NOT EXISTS "spring_session"
+(
+    primary_id CHAR(36) PRIMARY KEY,
+    session_id CHAR(36) NOT NULL,
+    creation_time BIGINT NOT NULL,
+    last_access_time BIGINT NOT NULL,
+    max_inactive_interval INT NOT NULL,
+    expiry_time BIGINT NOT NULL,
+    principal_name VARCHAR(100)
 );
 
-create unique index SPRING_SESSION_IX1 on SPRING_SESSION (SESSION_ID);
-create index SPRING_SESSION_IX2 on SPRING_SESSION (EXPIRY_TIME);
-create index SPRING_SESSION_IX3 on SPRING_SESSION (PRINCIPAL_NAME);
+CREATE UNIQUE INDEX IF NOT EXISTS spring_session_ix1 ON spring_session (session_id);
+CREATE INDEX IF NOT EXISTS spring_session_ix2 ON spring_session (expiry_time);
+CREATE INDEX IF NOT EXISTS spring_session_ix3 ON spring_session (principal_name);
 
-create table if not exists `SPRING_SESSION_ATTRIBUTES` (
-                                           SESSION_PRIMARY_ID CHAR(36) NOT NULL,
-                                           ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
-                                           ATTRIBUTE_BYTES LONGBLOB NOT NULL,
-                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
-                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION(PRIMARY_ID) ON delete CASCADE
+CREATE TABLE IF NOT EXISTS "spring_session_attributes"
+(
+    session_primary_id CHAR(36) NOT NULL,
+    attribute_name VARCHAR(200) NOT NULL,
+    attribute_bytes bytea NOT NULL,
+    PRIMARY KEY (session_primary_id, attribute_name),
+    CONSTRAINT spring_session_attributes_fk FOREIGN KEY (session_primary_id)
+        REFERENCES "spring_session" (primary_id) ON DELETE CASCADE
 );
-

@@ -37,20 +37,14 @@ public class RegisterController {
   private final UserService userService;
   private final OauthSessionValidator sessionValidator;
   private final String rangifflerFrontUri;
-  private final String mobileCustomScheme;
-  private final String androidAppUri;
 
   @Autowired
   public RegisterController(UserService userService,
                             OauthSessionValidator sessionValidator,
-                            @Value("${rangiffler-front.base-uri}") String rangifflerFrontUri,
-                            @Value("${oauth2.mobile-custom-scheme}") String mobileCustomScheme,
-                            @Value("${oauth2.android-app-uri}") String androidAppUri) {
+                            @Value("${rangiffler-front.base-uri}") String rangifflerFrontUri) {
     this.userService = userService;
     this.sessionValidator = sessionValidator;
     this.rangifflerFrontUri = rangifflerFrontUri;
-    this.mobileCustomScheme = mobileCustomScheme;
-    this.androidAppUri = androidAppUri;
   }
 
   @GetMapping("/register")
@@ -86,10 +80,7 @@ public class RegisterController {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 
-    if (sessionValidator.isAndroidOauthSession(session)) {
-      model.addAttribute(MODEL_FRONT_URI_ATTR, mobileCustomScheme + androidAppUri + Callbacks.Android.login);
-      model.addAttribute(MODEL_FINAL_STEP_BTN_TEXT_ATTR, "Back to Application");
-    } else {
+    if (sessionValidator.isWebOauthSession(session)) {
       model.addAttribute(MODEL_FRONT_URI_ATTR, rangifflerFrontUri + Callbacks.Web.init);
     }
     return REGISTRATION_VIEW_NAME;

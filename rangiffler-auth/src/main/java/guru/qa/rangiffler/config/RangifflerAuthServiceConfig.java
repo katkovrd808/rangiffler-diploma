@@ -13,11 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.session.DefaultCookieSerializerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,8 +40,6 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import org.springframework.security.web.PortMapperImpl;
-import org.springframework.security.web.PortResolverImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
@@ -55,7 +50,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 import java.util.UUID;
 
 @Configuration
@@ -65,36 +59,20 @@ public class RangifflerAuthServiceConfig {
   private final KeyManager keyManager;
   private final String rangifflerFrontUri;
   private final String rangifflerAuthUri;
-  private final String androidAppUri;
   private final String webClientId;
-  private final String mobileClientId;
-  private final String mobileCustomScheme;
   private final CorsCustomizer corsCustomizer;
-  private final String serverPort;
-  private final String defaultHttpsPort = "443";
-  private final Environment environment;
 
   @Autowired
   public RangifflerAuthServiceConfig(KeyManager keyManager,
                                      @Value("${rangiffler-front.base-uri}") String rangifflerFrontUri,
                                      @Value("${rangiffler-auth.base-uri}") String rangifflerAuthUri,
-                                     @Value("${oauth2.android-app-uri}") String androidAppUri,
                                      @Value("${oauth2.web-client-id}") String webClientId,
-                                     @Value("${oauth2.mobile-client-id}") String mobileClientId,
-                                     @Value("${oauth2.mobile-custom-scheme}") String mobileCustomScheme,
-                                     @Value("${server.port}") String serverPort,
-                                     CorsCustomizer corsCustomizer,
-                                     Environment environment) {
+                                     CorsCustomizer corsCustomizer) {
     this.keyManager = keyManager;
     this.rangifflerFrontUri = rangifflerFrontUri;
     this.rangifflerAuthUri = rangifflerAuthUri;
-    this.androidAppUri = androidAppUri;
     this.webClientId = webClientId;
-    this.mobileClientId = mobileClientId;
-    this.mobileCustomScheme = mobileCustomScheme;
-    this.serverPort = serverPort;
     this.corsCustomizer = corsCustomizer;
-    this.environment = environment;
   }
 
   @Bean
@@ -104,12 +82,10 @@ public class RangifflerAuthServiceConfig {
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
       OAuth2AuthorizationServerConfigurer.authorizationServer();
 
-    if (environment.acceptsProfiles(Profiles.of("local", "staging"))) {
-      http.addFilterBefore(new SpecificRequestDumperFilter(
-        new RequestDumperFilter(),
-        "/login", "/connect/logout", "/oauth2/.*"
-      ), DisableEncodeUrlFilter.class);
-    }
+    http.addFilterBefore(new SpecificRequestDumperFilter(
+      new RequestDumperFilter(),
+      "/login", "/connect/logout", "/oauth2/.*"
+    ), DisableEncodeUrlFilter.class);
 
     http
       .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
@@ -142,25 +118,6 @@ public class RangifflerAuthServiceConfig {
   }
 
   @Bean
-  @Profile({"staging", "prod"})
-  public LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPointHttps() {
-    LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint("/login");
-    PortMapperImpl portMapper = new PortMapperImpl();
-    portMapper.setPortMappings(Map.of(
-      serverPort, defaultHttpsPort,
-      "80", defaultHttpsPort,
-      "8080", "8443"
-    ));
-    PortResolverImpl portResolver = new PortResolverImpl();
-    portResolver.setPortMapper(portMapper);
-    entryPoint.setForceHttps(true);
-    entryPoint.setPortMapper(portMapper);
-    entryPoint.setPortResolver(portResolver);
-    return entryPoint;
-  }
-
-  @Bean
-  @Profile({"local", "docker", "test"})
   public LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPointHttp() {
     return new LoginUrlAuthenticationEntryPoint("/login");
   }
@@ -169,22 +126,12 @@ public class RangifflerAuthServiceConfig {
   public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
     RegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
     RegisteredClient webClient = registeredClientRepository.findByClientId(webClientId);
-    RegisteredClient mobileClient = registeredClientRepository.findByClientId(mobileClientId);
     if (webClient == null) {
       registeredClientRepository.save(
         registeredClient(
           webClientId,
           rangifflerFrontUri + Callbacks.Web.login,
           rangifflerFrontUri + Callbacks.Web.logout
-        )
-      );
-    }
-    if (mobileClient == null) {
-      registeredClientRepository.save(
-        registeredClient(
-          mobileClientId,
-          mobileCustomScheme + androidAppUri + Callbacks.Android.login,
-          mobileCustomScheme + androidAppUri + Callbacks.Android.logout
         )
       );
     }

@@ -16,24 +16,14 @@ public class OauthSessionValidator {
   private static final String PRE_REQ_URI = "/oauth2/authorize";
 
   private final String rangifflerFrontUri;
-  private final String mobileCustomScheme;
-  private final String androidAppUri;
 
   @Autowired
-  public OauthSessionValidator(@Value("${rangiffler-front.base-uri}") String rangifflerFrontUri,
-                               @Value("${oauth2.mobile-custom-scheme}") String mobileCustomScheme,
-                               @Value("${oauth2.android-app-uri}") String androidAppUri) {
+  public OauthSessionValidator(@Value("${rangiffler-front.base-uri}") String rangifflerFrontUri) {
     this.rangifflerFrontUri = rangifflerFrontUri;
-    this.mobileCustomScheme = mobileCustomScheme;
-    this.androidAppUri = androidAppUri;
   }
 
   public boolean isWebOauthSession(@Nonnull HttpSession session) {
     return isOauthSessionContainsRedirectUri(session, rangifflerFrontUri);
-  }
-
-  public boolean isAndroidOauthSession(@Nonnull HttpSession session) {
-    return isOauthSessionContainsRedirectUri(session, mobileCustomScheme + androidAppUri);
   }
 
   private boolean isOauthSessionContainsRedirectUri(@Nonnull HttpSession session, @Nonnull String redirectUri) {

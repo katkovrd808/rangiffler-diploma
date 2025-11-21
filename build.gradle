@@ -12,6 +12,14 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/snapshot' }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.grpc:spring-grpc-dependencies:0.4.0-SNAPSHOT'
+        }
     }
 
     java {
@@ -38,13 +46,7 @@ subprojects {
         apacheCsvVersion = '1.14.0'
         h2Version = '2.3.232'
         mockitoVersion = '5.17.0'
-
-        dockerImage = System.getProperty("os.arch") == "aarch64" || System.getProperty("os.arch") == "arm64"
-                ? "arm64v8/eclipse-temurin:21-jdk"
-                : "eclipse-temurin:21-jdk"
-        dockerArch = System.getProperty("os.arch") == "aarch64" || System.getProperty("os.arch") == "arm64"
-                ? "arm64"
-                : "amd64"
+        mapStructVersion = '1.5.5.Final'
     }
 
     tasks.withType(Test).configureEach {

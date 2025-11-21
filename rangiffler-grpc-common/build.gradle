@@ -1,41 +1,25 @@
 plugins {
-    id 'java'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'java-library'
     id 'com.google.protobuf' version '0.9.5'
 }
 
 group = 'guru.qa'
 version = 'unspecified'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.grpc:spring-grpc-dependencies:0.4.0-SNAPSHOT'
-    }
-}
-
 dependencies {
-    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
-    implementation "com.google.protobuf:protobuf-java-util:${dependencyManagement.importedProperties['protobuf-java.version']}"
-    implementation 'io.grpc:grpc-services'
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    //GRPC
+    api 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    api "com.google.protobuf:protobuf-java-util:${dependencyManagement.importedProperties['protobuf-java.version']}"
+    api 'io.grpc:grpc-services'
+    //UTIL
+    api "org.mapstruct:mapstruct:${project.ext.mapStructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
+    annotationProcessor "org.projectlombok:lombok:1.18.38"
+    compileOnly "org.projectlombok:lombok:1.18.38"
+    //TEST
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    annotationProcessor "org.projectlombok:lombok:1.18.38"
-    compileOnly "org.projectlombok:lombok:1.18.38"
 }
 
 protobuf {
@@ -58,8 +42,4 @@ protobuf {
                 }
         }
     }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }

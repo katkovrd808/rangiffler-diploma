@@ -1,19 +1,32 @@
 plugins {
-    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'com.google.protobuf' version '0.9.5'
 }
 
 group = 'guru.qa'
-version = 'unspecified'
-
-repositories {
-    mavenCentral()
-}
+version = '2.4.10'
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-test {
-    useJUnitPlatform()
+    implementation project(':rangiffler-grpc-common')
+    //WEB
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation('org.springframework.boot:spring-boot-starter-web-services') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+    //DB
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "org.flywaydb:flyway-database-postgresql:${project.ext.flywayVersion}"
+    implementation "org.flywaydb:flyway-core:${project.ext.flywayVersion}"
+    runtimeOnly "org.postgresql:postgresql:${project.ext.postgresDriverVersion}"
+    testImplementation "com.h2database:h2:${project.ext.h2Version}"
+    //KAFKA
+    implementation "org.springframework.kafka:spring-kafka:${project.ext.springKafkaVersion}"
+    //UTIL
+    implementation "wsdl4j:wsdl4j:${project.ext.wsdl4jVersion}"
+    implementation "net.coobird:thumbnailator:${project.ext.thumbnailatorVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
+    annotationProcessor "org.projectlombok:lombok:1.18.38"
+    compileOnly "org.projectlombok:lombok:1.18.38"
+    //TEST
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

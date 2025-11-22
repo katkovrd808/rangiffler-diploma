@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package guru.qa.grpc.rangiffler;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "guru.qa.rangiffler.grpc";
+option java_outer_classname = "RangifflerUserdataProto";
+
+service RangifflerUserdataService {
+    rpc GetUser(UserRequest) returns (UserResponse);
+    rpc AllUsers(UserRequest) returns (UsersResponse);
+    rpc UpdateUser(UserRequest) returns (UpdateUserResponse);
+}
+
+service RangifflerCountriesService {
+    rpc GetCountry(CountryRequest) returns (CountryResponse);
+    rpc AllCountries(google.protobuf.Empty) returns (CountriesResponse);
+}
+
+message UserResponse {
+    string id = 1;
+    string username = 2;
+    string firstname = 3;
+    string surname = 4;
+    bytes photo = 5;
+    FriendStatus friendship_status = 6;
+    repeated UserResponse friends = 7;
+    repeated UserResponse income_invitations = 8;
+    repeated UserResponse outcome_invitations = 9;
+    CountryResponse location = 10;
+}
+
+message UserRequest {
+    string username = 1;
+    optional string firstname = 2;
+    optional string surname = 3;
+    optional bytes photo = 4;
+    optional string location = 5;
+}
+
+message UsersResponse {
+    repeated UserResponse user = 1;
+}
+
+message UpdateUserResponse {
+    string username = 1;
+    string firstname = 2;
+    string surname = 3;
+    bytes photo = 4;
+    CountryResponse location = 5;
+}
+
+message CountryResponse {
+    string id = 1;
+    string name = 2;
+    string code = 3;
+    bytes flag = 4;
+}
+
+message CountryRequest {
+    string code = 1;
+}
+
+message CountriesResponse {
+    repeated CountryResponse countries = 1;
+}
+
+enum FriendStatus {
+    NOT_FRIEND = 0;
+    INVITATION_SENT = 1;
+    INVITATION_RECEIVED = 2;
+    FRIEND = 3;
+}

@@ -1,0 +1,24 @@
+CREATE extension IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS "user"
+(
+    id                      UUID        UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    username                varchar(50) UNIQUE NOT NULL,
+    firstname               varchar(255),
+    surname                 varchar(255),
+    photo                   bytea,
+    country_id              UUID               NOT NULL,
+    PRIMARY KEY (id)
+);
+
+create table if not exists "friendship"
+(
+    requester_id UUID    NOT NULL,
+    addressee_id UUID    NOT NULL,
+    created_date date      NOT NULL,
+    status varchar(50)         NOT NULL,
+    PRIMARY KEY (requester_id, addressee_id),
+    CONSTRAINT friend_are_distinct_ck CHECK (requester_id <> addressee_id),
+    CONSTRAINT fk_requester_id FOREIGN KEY (requester_id) REFERENCES "user" (id),
+    CONSTRAINT fk_addressee_id FOREIGN KEY (addressee_id) REFERENCES "user" (id)
+);

@@ -7,7 +7,7 @@ spring:
 
   logging:
     file:
-      path: ./logs/niffler-gateway
+      path: ./logs/rangiffler-gateway
     level:
       root: INFO
       org.springframework.web: INFO
@@ -40,3 +40,5 @@ rangiffler-front:
   base-uri: 'http://127.0.0.1:3001'
 rangiffler-gateway:
   base-uri: 'http://127.0.0.1:8080'
+rangiffler-userdata:
+  base-uri: 'http://127.0.0.1:8081'

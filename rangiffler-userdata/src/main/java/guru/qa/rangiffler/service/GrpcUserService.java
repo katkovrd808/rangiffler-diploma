@@ -4,7 +4,6 @@ import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.repository.UserRepository;
 import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.UserJson;
-import guru.qa.rangiffler.service.mapper.UserMapper;
 import io.grpc.stub.StreamObserver;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;

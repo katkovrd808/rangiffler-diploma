@@ -3,13 +3,11 @@ package guru.qa.rangiffler.service.mapper;
 import com.google.protobuf.ByteString;
 import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.grpc.UpdateUserResponse;
-import guru.qa.rangiffler.grpc.UserRequest;
 import guru.qa.rangiffler.grpc.UserResponse;
 import guru.qa.rangiffler.grpc.UsersResponse;
 import org.mapstruct.Mapper;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -7,7 +7,6 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 @Setter

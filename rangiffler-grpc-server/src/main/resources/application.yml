@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: rangiffler-grpc-server
+  grpc:
+    server:
+      port: 9090
+      servlet:
+        enabled: false
+      security:
+        csrf:
+          enabled: false
+  logging:
+    file:
+      path: ./logs/rangiffler-grpc-server
+    level:
+      root: INFO
+      org.springframework.web: INFO
+      org.springframework.security: INFO
+      org.springframework.security.oauth2: INFO
+      net.devh.boot.grpc: INFO
+      org.springframework.boot.autoconfigure: INFO

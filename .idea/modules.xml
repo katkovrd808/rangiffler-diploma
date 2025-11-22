@@ -3,6 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-grpc-common/rangiffler-diploma.rangiffler-grpc-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-grpc-common/rangiffler-diploma.rangiffler-grpc-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-userdata/rangiffler-diploma.rangiffler-userdata.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-userdata/rangiffler-diploma.rangiffler-userdata.main.iml" />
     </modules>
   </component>
 </project>

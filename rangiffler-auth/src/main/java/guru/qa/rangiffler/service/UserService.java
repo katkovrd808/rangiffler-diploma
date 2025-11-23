@@ -34,7 +34,7 @@ public class UserService {
 
   @Transactional
   public @Nonnull
-  String registerUser(@Nonnull String username, @Nonnull String password) {
+  String registerUser(@Nonnull String username, @Nonnull String password, @Nonnull String countryCode) {
     UserEntity userEntity = new UserEntity();
     userEntity.setEnabled(true);
     userEntity.setAccountNonExpired(true);
@@ -50,7 +50,7 @@ public class UserService {
 
     userEntity.addAuthorities(readAuthorityEntity, writeAuthorityEntity);
     String savedUser = userRepository.save(userEntity).getUsername();
-    kafkaTemplate.send("users", new UserJson(savedUser));
+    kafkaTemplate.send("users", new UserJson(savedUser, countryCode));
     LOG.info("### Kafka topic [users] sent message: {}", savedUser);
     return savedUser;
   }

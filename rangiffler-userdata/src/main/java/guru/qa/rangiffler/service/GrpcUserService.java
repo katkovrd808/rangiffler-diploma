@@ -4,11 +4,14 @@ import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.repository.UserRepository;
 import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.UserJson;
+import guru.qa.rangiffler.service.api.GrpcCountriesClient;
 import io.grpc.stub.StreamObserver;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
@@ -21,20 +24,24 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
   private static final Logger LOG = LoggerFactory.getLogger(GrpcUserService.class);
 
-  public static final String COUNTRY_ID = "03a90efc-9212-49f5-bcea-3347a6f1d77b";
-
   private final UserRepository userRepository;
+  private final GrpcCountriesClient grpcCountriesClient;
   private final UserService userService;
 
   @Autowired
-  public GrpcUserService(UserRepository userRepository, UserService userService) {
+  public GrpcUserService(UserRepository userRepository,
+                         UserService userService,
+                         GrpcCountriesClient grpcCountriesClient) {
     this.userRepository = userRepository;
+    this.grpcCountriesClient = grpcCountriesClient;
     this.userService = userService;
   }
 
   @Transactional
   @KafkaListener(topics = "users", groupId = "userdata")
   public void listener(@Payload UserJson user, ConsumerRecord<String, UserJson> cr) {
+    UUID countryId = grpcCountriesClient.getCountryId(user.countryCode());
+    LOG.info("### User with username {} and country id {} received from Kafka ###", user.username(), countryId);
     userRepository.findByUsername(user.username())
       .ifPresentOrElse(
         u -> LOG.info("### User already exist in DB, kafka event will be skipped: {}", cr.toString()),
@@ -43,7 +50,7 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
           UserEntity userDataEntity = new UserEntity();
           userDataEntity.setUsername(user.username());
-          userDataEntity.setCountryId(UUID.fromString(COUNTRY_ID));
+          userDataEntity.setCountryId(countryId);
           UserEntity userEntity = userRepository.save(userDataEntity);
 
           LOG.info(

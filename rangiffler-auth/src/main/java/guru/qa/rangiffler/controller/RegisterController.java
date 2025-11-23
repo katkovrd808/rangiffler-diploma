@@ -2,9 +2,11 @@ package guru.qa.rangiffler.controller;
 
 import guru.qa.rangiffler.config.Callbacks;
 import guru.qa.rangiffler.model.RegistrationModel;
+import guru.qa.rangiffler.service.GeoLocationService;
 import guru.qa.rangiffler.service.OauthSessionValidator;
 import guru.qa.rangiffler.service.UserService;
 import jakarta.annotation.Nonnull;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -36,20 +38,24 @@ public class RegisterController {
 
   private final UserService userService;
   private final OauthSessionValidator sessionValidator;
+  private final GeoLocationService geoLocationService;
   private final String rangifflerFrontUri;
 
   @Autowired
   public RegisterController(UserService userService,
                             OauthSessionValidator sessionValidator,
+                            GeoLocationService geoLocationService,
                             @Value("${rangiffler-front.base-uri}") String rangifflerFrontUri) {
     this.userService = userService;
     this.sessionValidator = sessionValidator;
+    this.geoLocationService = geoLocationService;
     this.rangifflerFrontUri = rangifflerFrontUri;
   }
 
   @GetMapping("/register")
   public String getRegisterPage(@Nonnull Model model) {
     model.addAttribute(MODEL_REG_FORM_ATTR, new RegistrationModel(null, null, null));
+    model.addAttribute(MODEL_FRONT_URI_ATTR, rangifflerFrontUri);
     return REGISTRATION_VIEW_NAME;
   }
 
@@ -58,13 +64,18 @@ public class RegisterController {
                              Errors errors,
                              Model model,
                              HttpServletResponse response,
+                             HttpServletRequest request,
                              HttpSession session) {
     if (!errors.hasErrors()) {
       final String registeredUserName;
       try {
+        String clientIP = getClientIP(request);
+        String countryCode = geoLocationService.countryCountryCodeByIP(clientIP);
+        LOG.info("### Received request from IP: {}, and country code: {}###", clientIP, countryCode);
         registeredUserName = userService.registerUser(
           registrationModel.username(),
-          registrationModel.password()
+          registrationModel.password(),
+          countryCode
         );
         response.setStatus(HttpServletResponse.SC_CREATED);
         model.addAttribute(MODEL_USERNAME_ATTR, registeredUserName);
@@ -95,5 +106,13 @@ public class RegisterController {
       errorResult = new BeanPropertyBindingResult(registrationModel, "registrationModel");
     }
     errorResult.addError(new FieldError("registrationModel", fieldName, error));
+  }
+
+  private String getClientIP(HttpServletRequest request) {
+    String xfHeader = request.getHeader("X-Forwarded-For");
+    if (xfHeader != null) {
+      return xfHeader.split(",")[0].trim();
+    }
+    return request.getRemoteAddr();
   }
 }

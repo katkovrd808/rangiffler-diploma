@@ -1,0 +1,18 @@
+package guru.qa.rangiffler.config;
+
+import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
+import io.grpc.Channel;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.grpc.client.GrpcChannelFactory;
+
+@Configuration
+public class GrpcCountriesClientConfiguration {
+  @Bean
+  public RangifflerCountriesServiceGrpc.RangifflerCountriesServiceBlockingStub rangifflerCountriesServiceBlockingStub(
+    GrpcChannelFactory grpcChannelFactory
+  ) {
+    Channel channel = grpcChannelFactory.createChannel("countries-service");
+    return RangifflerCountriesServiceGrpc.newBlockingStub(channel);
+  }
+}

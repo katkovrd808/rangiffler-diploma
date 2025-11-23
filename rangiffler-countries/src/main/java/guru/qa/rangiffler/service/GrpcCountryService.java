@@ -6,17 +6,12 @@ import guru.qa.rangiffler.grpc.CountryRequest;
 import guru.qa.rangiffler.grpc.CountryResponse;
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
 import io.grpc.stub.StreamObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.grpc.server.service.GrpcService;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
-@Service
+@GrpcService
 @ParametersAreNonnullByDefault
 public class GrpcCountryService extends RangifflerCountriesServiceGrpc.RangifflerCountriesServiceImplBase {
 

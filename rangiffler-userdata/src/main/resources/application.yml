@@ -12,6 +12,10 @@ spring:
       security:
         csrf:
           enabled: false
+    client:
+      channels:
+        countries-service:
+          address: 127.0.0.1:9090
   kafka:
     bootstrap-servers: 'localhost:9092'
     consumer:

@@ -6,8 +6,12 @@ spring:
     name: rangiffler-countries
   grpc:
     server:
-      port: 9093
-      enabled: true
+      port: 9090
+      servlet:
+        enabled: false
+      security:
+        csrf:
+          enabled: false
   logging:
     file:
       path: ./logs/rangiffler-countries

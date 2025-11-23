@@ -2,6 +2,7 @@ package guru.qa.rangiffler.service.impl;
 
 import guru.qa.rangiffler.data.CountryEntity;
 import guru.qa.rangiffler.data.repository.CountryRepository;
+import guru.qa.rangiffler.ex.IsoCodeMismatchException;
 import guru.qa.rangiffler.grpc.CountriesResponse;
 import guru.qa.rangiffler.grpc.CountryResponse;
 import guru.qa.rangiffler.ex.CountryNotFoundException;
@@ -31,7 +32,10 @@ public class DbCountryService implements CountryService {
   @Override
   @Transactional(readOnly = true)
   public @Nonnull CountryResponse findByIsoCode(String isoCode) {
-    return countryRepository.findByIsoCode(isoCode)
+    if (isoCode == null || !isoCode.matches("^[A-Za-z]{2,3}$")) {
+      throw new IsoCodeMismatchException("Iso code pattern mismatch. Accepts only ISO-2 code.");
+    }
+    return countryRepository.findByIsoCode(isoCode.toUpperCase())
       .map(countryMapper::toProto)
       .orElseThrow(() -> new CountryNotFoundException("Can't find country with iso code: " + isoCode));
   }

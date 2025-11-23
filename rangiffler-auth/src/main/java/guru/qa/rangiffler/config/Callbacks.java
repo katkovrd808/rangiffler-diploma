@@ -11,6 +11,6 @@ public interface Callbacks {
   interface Web {
     String login = "/authorized";
     String logout = "/logout";
-    String init = "/main";
+    String init = "/my-travels";
   }
 }

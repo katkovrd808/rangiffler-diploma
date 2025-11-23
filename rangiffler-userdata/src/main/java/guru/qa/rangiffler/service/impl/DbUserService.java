@@ -1,13 +1,11 @@
 package guru.qa.rangiffler.service.impl;
 
-import guru.qa.rangiffler.data.FriendStatus;
 import guru.qa.rangiffler.data.FriendshipEntity;
 import guru.qa.rangiffler.data.FriendshipStatus;
 import guru.qa.rangiffler.data.UserEntity;
-import guru.qa.rangiffler.data.projection.FriendWithStatus;
+import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.data.repository.FriendshipRepository;
 import guru.qa.rangiffler.data.repository.UserRepository;
-import guru.qa.rangiffler.ex.NotFoundException;
 import guru.qa.rangiffler.ex.SameUsernameException;
 import guru.qa.rangiffler.ex.UserNotFoundException;
 import guru.qa.rangiffler.grpc.*;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,7 +58,6 @@ public class DbUserService implements UserService {
     return userMapper.toProtoList(users);
   }
 
-  //TODO FIX
   @Override
   @Transactional
   public @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user) {
@@ -77,52 +75,85 @@ public class DbUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable, String username) {
+  public @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable,
+                                                         String username,
+                                                         @Nullable String searchQuery) {
+    if (username.isEmpty()) {
+      throw new IllegalArgumentException("User can't be empty.");
+    }
     UserEntity ue = getRequiredUser(username);
-    return userMapper.toProtoFriendsList(
-      friendshipRepository.findFriendsWithStatus(pageable, ue, FriendStatus.FRIEND)
-    );
+    Page<UserWithStatus> users = searchQuery == null ?
+      friendshipRepository.findFriends(ue, pageable) :
+      friendshipRepository.findFriends(ue, searchQuery, pageable);
+    return userMapper.toProtoFriendsList(users);
   }
 
+  @Nonnull
   @Override
-  @Transactional(readOnly = true)
-  public @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable, String username) {
+  public InvitationsPaginatedResponse incomeInvitations(Pageable pageable,
+                                                        String username,
+                                                        @Nullable String searchQuery) {
+    if (username.isEmpty()) {
+      throw new IllegalArgumentException("User can't be empty.");
+    }
     UserEntity ue = getRequiredUser(username);
-    return userMapper.toProtoInvitationsList(
-      friendshipRepository.findFriendsWithStatus(pageable, ue, FriendStatus.INVITATION_RECEIVED)
-    );
+    Page<UserWithStatus> users = searchQuery == null ?
+      friendshipRepository.findIncomeInvitations(ue, pageable) :
+      friendshipRepository.findIncomeInvitations(ue, searchQuery, pageable);
+    return userMapper.toProtoInvitationsList(users);
   }
 
+  @Nonnull
   @Override
-  @Transactional(readOnly = true)
-  public @Nonnull InvitationsPaginatedResponse outcomeInvitations(Pageable pageable, String username) {
+  public InvitationsPaginatedResponse outcomeInvitations(Pageable pageable,
+                                                         String username,
+                                                         @Nullable String searchQuery) {
+    if (username.isEmpty()) {
+      throw new IllegalArgumentException("User can't be empty.");
+    }
     UserEntity ue = getRequiredUser(username);
-    return userMapper.toProtoInvitationsList(
-      friendshipRepository.findFriendsWithStatus(pageable, ue, FriendStatus.INVITATION_SENT)
-    );
+    Page<UserWithStatus> users = searchQuery == null ?
+      friendshipRepository.findOutcomeInvitations(ue, pageable) :
+      friendshipRepository.findOutcomeInvitations(ue, searchQuery, pageable);
+    return userMapper.toProtoInvitationsList(users);
   }
 
   @Override
   @Transactional
   public @Nonnull FriendshipResponse sendFriendshipRequest(String username, String targetUsername) {
     if (Objects.equals(username, targetUsername)) {
-      throw new SameUsernameException("Can`t create friendship request for self user");
+      throw new SameUsernameException("Can't create friendship request for self user");
     }
     UserEntity user = getRequiredUser(username);
     UserEntity target = getRequiredUser(targetUsername);
-    final guru.qa.rangiffler.data.FriendStatus returnedStates;
-    Optional<FriendshipEntity> mayBeInvite = getFriendshipRequest(user, target);
-    if (mayBeInvite.isPresent()) {
-      mayBeInvite.get().setStatus(FriendshipStatus.ACCEPTED);
-      user.addFriends(FriendshipStatus.ACCEPTED, target);
-      returnedStates = FriendStatus.FRIEND;
+    Optional<FriendshipEntity> existingFriendship = findAnyFriendshipBetween(user, target);
+
+    final FriendshipStatus friendshipStatusToSet;
+
+    if (existingFriendship.isPresent()) {
+      FriendshipEntity fe = existingFriendship.get();
+      FriendshipStatus status = fe.getStatus();
+
+      if (status == FriendshipStatus.PENDING) {
+        if (fe.getAddressee().equals(user)) {
+          fe.setStatus(FriendshipStatus.ACCEPTED);
+          friendshipStatusToSet = FriendshipStatus.ACCEPTED;
+          friendshipRepository.save(fe);
+        } else {
+          friendshipStatusToSet = FriendshipStatus.PENDING;
+        }
+      } else {
+        friendshipStatusToSet = status;
+      }
     } else {
       user.addFriends(FriendshipStatus.PENDING, target);
-      returnedStates = FriendStatus.INVITATION_SENT;
+      friendshipStatusToSet = FriendshipStatus.PENDING;
     }
+
     userRepository.save(user);
     userRepository.save(target);
-    return userMapper.toProtoFriendship(FriendWithStatus.fromEntity(target, returnedStates));
+
+    return userMapper.toProtoFriendship(UserWithStatus.fromEntity(target, friendshipStatusToSet));
   }
 
   @Override
@@ -134,13 +165,8 @@ public class DbUserService implements UserService {
     UserEntity user = getRequiredUser(username);
     UserEntity target = getRequiredUser(targetUsername);
 
-    FriendshipEntity invite = getFriendshipRequest(user, target)
-      .orElseThrow(() -> new NotFoundException("Can`t find invitation from username: '" + targetUsername + "'"));
-
-    invite.setStatus(FriendshipStatus.ACCEPTED);
-    user.addFriends(FriendshipStatus.ACCEPTED, target);
-    userRepository.save(user);
-    return userMapper.toProtoFriendship(FriendWithStatus.fromEntity(target, FriendStatus.FRIEND));
+    Optional<FriendshipEntity> existingFriendship = findAnyFriendshipBetween(user, target);
+    return null;
   }
 
   @Override
@@ -153,11 +179,9 @@ public class DbUserService implements UserService {
     UserEntity target = getRequiredUser(targetUsername);
 
     user.removeInvites(target);
-    target.removeFriends(user);
 
     userRepository.save(user);
-    userRepository.save(target);
-    return userMapper.toProtoFriendship(FriendWithStatus.fromEntity(target, FriendStatus.NOT_FRIEND));
+    return null;
   }
 
   @Override
@@ -171,12 +195,13 @@ public class DbUserService implements UserService {
 
     user.removeFriends(target);
     user.removeInvites(target);
-    target.removeFriends(user);
-    target.removeInvites(user);
 
     userRepository.save(user);
-    userRepository.save(target);
-    return userMapper.toProtoFriendship(FriendWithStatus.fromEntity(target, FriendStatus.NOT_FRIEND));
+    return null;
+  }
+
+  public static boolean isPhotoString(String photo) {
+    return photo != null && photo.startsWith("data:image");
   }
 
   @Nonnull UserEntity getRequiredUser(String username) {
@@ -185,10 +210,25 @@ public class DbUserService implements UserService {
     );
   }
 
-  private @Nonnull Optional<FriendshipEntity> getFriendshipRequest(UserEntity currentUser, UserEntity targetUser) {
-    return currentUser.getFriendshipAddressees()
+  private @Nonnull Optional<FriendshipEntity> findAnyFriendshipBetween(UserEntity currentUser, UserEntity targetUser) {
+    Optional<FriendshipEntity> requester = currentUser.getFriendshipRequests()
+      .stream()
+      .filter(fe -> fe.getAddressee() != null && fe.getAddressee().equals(targetUser))
+      .findFirst();
+
+    if (requester.isPresent()) {
+      return requester;
+    }
+
+    Optional<FriendshipEntity> addressee = currentUser.getFriendshipAddressees()
       .stream()
       .filter(fe -> fe.getRequester() != null && fe.getRequester().equals(targetUser))
       .findFirst();
+
+    return addressee;
+  }
+
+  private void createFriendshipRequest(UserEntity requester, UserEntity addressee, FriendshipStatus status) {
+    requester.addFriends(status, addressee);
   }
 }

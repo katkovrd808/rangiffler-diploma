@@ -1,8 +1,9 @@
 package guru.qa.rangiffler.service.mapper;
 
 import com.google.protobuf.ByteString;
+import guru.qa.rangiffler.data.FriendshipStatus;
 import guru.qa.rangiffler.data.UserEntity;
-import guru.qa.rangiffler.data.projection.FriendWithStatus;
+import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.grpc.*;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
@@ -10,15 +11,11 @@ import org.springframework.data.domain.Page;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 @ParametersAreNonnullByDefault
 public interface UserMapper {
-
-  guru.qa.rangiffler.grpc.FriendStatus mapStatus(guru.qa.rangiffler.data.FriendStatus status);
-
   default @Nonnull UserResponse toProto(UserEntity user) {
     return UserResponse.newBuilder()
       .setId(user.getId().toString())
@@ -51,7 +48,7 @@ public interface UserMapper {
       .build();
   }
 
-  default @Nonnull Friend toProtoFriend(FriendWithStatus user) {
+  default @Nonnull Friend toProtoFriend(UserWithStatus user) {
     return user == null ? Friend.getDefaultInstance() :
       Friend.newBuilder()
         .setId(user.id().toString())
@@ -60,20 +57,26 @@ public interface UserMapper {
         .setSurname(user.surname() != null ? user.surname() : "")
         .setPhoto(user.photo() != null ? map(user.photo()) : ByteString.EMPTY)
         .setCountryId(!user.countryId().toString().isEmpty() ? user.countryId().toString() : "")
-        .setStatus(user.status() != null ? mapStatus(user.status()) : FriendStatus.UNRECOGNIZED)
+        .setStatus(user.status() == FriendshipStatus.PENDING ?
+          guru.qa.rangiffler.grpc.FriendStatus.INVITATION_SENT :
+          guru.qa.rangiffler.grpc.FriendStatus.FRIEND
+        )
         .build();
   }
 
-  default  @Nonnull FriendshipResponse toProtoFriendship(FriendWithStatus user) {
+  default  @Nonnull FriendshipResponse toProtoFriendship(UserWithStatus user) {
     return user == null ? FriendshipResponse.getDefaultInstance() :
       FriendshipResponse.newBuilder()
         .setId(user.id().toString())
         .setUsername(user.username())
-        .setStatus(mapStatus(user.status()))
+        .setStatus(user.status() == FriendshipStatus.PENDING ?
+          guru.qa.rangiffler.grpc.FriendStatus.INVITATION_SENT :
+          guru.qa.rangiffler.grpc.FriendStatus.FRIEND
+          )
         .build();
   }
 
-  default  @Nonnull AllFriendsPaginatedResponse toProtoFriendsList(Page<FriendWithStatus> friends) {
+  default  @Nonnull AllFriendsPaginatedResponse toProtoFriendsList(Page<UserWithStatus> friends) {
     return friends.isEmpty() ? AllFriendsPaginatedResponse.getDefaultInstance() :
       AllFriendsPaginatedResponse.newBuilder().addAllFriends(
           friends.stream()
@@ -83,7 +86,7 @@ public interface UserMapper {
         .build();
   }
 
-  default  @Nonnull InvitationsPaginatedResponse toProtoInvitationsList(Page<FriendWithStatus> friends) {
+  default  @Nonnull InvitationsPaginatedResponse toProtoInvitationsList(Page<UserWithStatus> friends) {
     return friends.isEmpty() ? InvitationsPaginatedResponse.getDefaultInstance() :
       InvitationsPaginatedResponse.newBuilder().addAllInvitations(
           friends.stream()
@@ -91,16 +94,6 @@ public interface UserMapper {
             .collect(Collectors.toList()))
         .setPaginationResponse(createPaginationResponse(friends))
         .build();
-  }
-
-  default @Nonnull UserEntity fromProtoRequest(UserUpdateRequest user) {
-    UserEntity ue = new UserEntity();
-    ue.setUsername(user.getUsername());
-    ue.setFirstname(user.getFirstname());
-    ue.setSurname(user.getSurname());
-    ue.setPhoto(user.getPhoto().toByteArray());
-    ue.setCountryId(UUID.fromString(user.getCountryId()));
-    return ue;
   }
 
   default  @Nonnull ByteString map(@Nullable byte[] value) {

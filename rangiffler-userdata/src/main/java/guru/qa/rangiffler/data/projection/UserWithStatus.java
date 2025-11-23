@@ -1,26 +1,26 @@
 package guru.qa.rangiffler.data.projection;
 
-import guru.qa.rangiffler.data.FriendStatus;
+import guru.qa.rangiffler.data.FriendshipStatus;
 import guru.qa.rangiffler.data.UserEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
-public record FriendWithStatus(
+public record UserWithStatus(
   UUID id,
   String username,
   String firstname,
   String surname,
   byte[] photo,
   UUID countryId,
-  FriendStatus status
+  FriendshipStatus status
 ) {
-  public FriendWithStatus {
+  public UserWithStatus {
   }
 
-  public static FriendWithStatus fromEntity(UserEntity entity, FriendStatus status) {
-    return new FriendWithStatus(
+  public static UserWithStatus fromEntity(UserEntity entity, FriendshipStatus status) {
+    return new UserWithStatus(
       entity.getId(),
       entity.getUsername(),
       entity.getFirstname(),

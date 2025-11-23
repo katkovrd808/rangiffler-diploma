@@ -4,6 +4,7 @@ import guru.qa.rangiffler.grpc.*;
 import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -14,11 +15,11 @@ public interface UserService {
 
   @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user);
 
-  @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable, String username);
+  @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable, String username, @Nullable String searchQuery);
 
-  @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable, String username);
+  @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);
 
-  @Nonnull InvitationsPaginatedResponse outcomeInvitations(Pageable pageable, String username);
+  @Nonnull InvitationsPaginatedResponse outcomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull FriendshipResponse sendFriendshipRequest(String username, String targetUsername);
 

@@ -107,6 +107,7 @@ message FriendshipResponse {
 
 message AllFriendsPaginatedRequest {
     string target_username = 1;
+    optional string search_query = 3;
     PaginationRequest pagination_request = 2;
 }
 
@@ -117,7 +118,8 @@ message AllFriendsPaginatedResponse {
 
 message InvitationsPaginatedRequest {
     string target_username = 1;
-    PaginationRequest pagination_request = 2;
+    optional string search_query = 2;
+    PaginationRequest pagination_request = 3;
 }
 
 message InvitationsPaginatedResponse {

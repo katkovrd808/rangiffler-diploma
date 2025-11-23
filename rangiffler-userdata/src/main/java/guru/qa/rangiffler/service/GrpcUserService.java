@@ -64,8 +64,9 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
   @Override
   public void allUsers(UsersPaginatedRequest request, StreamObserver<UsersPaginatedResponse> responseObserver) {
-    Pageable pageable = createPageable(request.getPaginationRequest());
-    UsersPaginatedResponse response = userService.getAllUsers(pageable, request.getExcludeUsername());
+    UsersPaginatedResponse response = userService.getAllUsers(
+      createPageable(request.getPaginationRequest()),
+      request.getExcludeUsername());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
@@ -86,21 +87,30 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
   @Override
   public void allFriends(AllFriendsPaginatedRequest request, StreamObserver<AllFriendsPaginatedResponse> responseObserver) {
-    AllFriendsPaginatedResponse response = userService.allFriends(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    AllFriendsPaginatedResponse response = userService.allFriends(
+      createPageable(request.getPaginationRequest()),
+      request.getTargetUsername(),
+      request.getSearchQuery());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
   public void getIncomeInvitations(InvitationsPaginatedRequest request, StreamObserver<InvitationsPaginatedResponse> responseObserver) {
-    InvitationsPaginatedResponse response = userService.incomeInvitations(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    InvitationsPaginatedResponse response = userService.incomeInvitations(
+      createPageable(request.getPaginationRequest()),
+      request.getTargetUsername(),
+      request.getSearchQuery());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
   public void getOutcomeInvitations(InvitationsPaginatedRequest request, StreamObserver<InvitationsPaginatedResponse> responseObserver) {
-    InvitationsPaginatedResponse response = userService.outcomeInvitations(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    InvitationsPaginatedResponse response = userService.outcomeInvitations(
+      createPageable(request.getPaginationRequest()),
+      request.getTargetUsername(),
+      request.getSearchQuery());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

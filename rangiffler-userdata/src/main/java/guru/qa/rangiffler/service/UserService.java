@@ -1,21 +1,30 @@
 package guru.qa.rangiffler.service;
 
-import guru.qa.rangiffler.grpc.UpdateUserResponse;
-import guru.qa.rangiffler.grpc.UserRequest;
-import guru.qa.rangiffler.grpc.UserResponse;
-import guru.qa.rangiffler.grpc.UsersResponse;
+import guru.qa.rangiffler.grpc.*;
+import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public interface UserService {
-  @Nonnull
-  UserResponse getUser(String username);
+  @Nonnull UserResponse getCurrentUser(String username);
 
-  @Nonnull
-  UsersResponse getAllUsers(String username);
+  @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username);
 
-  @Nonnull
-  UpdateUserResponse updateUser(UserRequest user);
+  @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user);
+
+  @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable, String username);
+
+  @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable, String username);
+
+  @Nonnull InvitationsPaginatedResponse outcomeInvitations(Pageable pageable, String username);
+
+  @Nonnull FriendshipResponse sendFriendshipRequest(String username, String targetUsername);
+
+  @Nonnull FriendshipResponse acceptFriendship(String username, String targetUsername);
+
+  @Nonnull FriendshipResponse declineFriendship(String username, String targetUsername);
+
+  @Nonnull FriendshipResponse deleteFriend(String username, String targetUsername);
 }

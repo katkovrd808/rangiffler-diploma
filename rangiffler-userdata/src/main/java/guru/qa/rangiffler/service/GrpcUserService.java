@@ -63,23 +63,80 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
   }
 
   @Override
-  public void allUsers(UserRequest request, StreamObserver<UsersResponse> responseObserver) {
-    UsersResponse response = userService.getAllUsers(request.getUsername());
+  public void allUsers(UsersPaginatedRequest request, StreamObserver<UsersPaginatedResponse> responseObserver) {
+    Pageable pageable = createPageable(request.getPaginationRequest());
+    UsersPaginatedResponse response = userService.getAllUsers(pageable, request.getExcludeUsername());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
   public void getUser(UserRequest request, StreamObserver<UserResponse> responseObserver) {
-    UserResponse response = userService.getUser(request.getUsername());
+    UserResponse response = userService.getCurrentUser(request.getUsername());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
-  public void updateUser(UserRequest request, StreamObserver<UpdateUserResponse> responseObserver) {
-    UpdateUserResponse response = userService.updateUser(request);
+  public void updateUser(UserUpdateRequest request, StreamObserver<UserUpdateResponse> responseObserver) {
+    UserUpdateResponse response = userService.updateUser(request);
     responseObserver.onNext(response);
     responseObserver.onCompleted();
+  }
+
+  @Override
+  public void allFriends(AllFriendsPaginatedRequest request, StreamObserver<AllFriendsPaginatedResponse> responseObserver) {
+    AllFriendsPaginatedResponse response = userService.allFriends(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getIncomeInvitations(InvitationsPaginatedRequest request, StreamObserver<InvitationsPaginatedResponse> responseObserver) {
+    InvitationsPaginatedResponse response = userService.incomeInvitations(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getOutcomeInvitations(InvitationsPaginatedRequest request, StreamObserver<InvitationsPaginatedResponse> responseObserver) {
+    InvitationsPaginatedResponse response = userService.outcomeInvitations(createPageable(request.getPaginationRequest()), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void createFriendshipRequest(FriendshipRequest request, StreamObserver<FriendshipResponse> responseObserver) {
+    FriendshipResponse response = userService.sendFriendshipRequest(request.getUsername(), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void acceptFriendshipRequest(FriendshipRequest request, StreamObserver<FriendshipResponse> responseObserver) {
+    FriendshipResponse response = userService.acceptFriendship(request.getUsername(), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void declineFriendshipRequest(FriendshipRequest request, StreamObserver<FriendshipResponse> responseObserver) {
+    FriendshipResponse response = userService.declineFriendship(request.getUsername(), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void deleteFriend(FriendshipRequest request, StreamObserver<FriendshipResponse> responseObserver) {
+    FriendshipResponse response = userService.deleteFriend(request.getUsername(), request.getTargetUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  private Pageable createPageable(PaginationRequest paginationRequest) {
+    return PageRequest.of(
+      paginationRequest.getPage(),
+      paginationRequest.getSize()
+    );
   }
 }

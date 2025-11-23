@@ -28,7 +28,7 @@ public class FriendshipEntity {
   private Date createdDate;
 
   @Enumerated(EnumType.STRING)
-  private FriendStatus status;
+  private FriendshipStatus status;
 
   @Override
   public final boolean equals(Object o) {

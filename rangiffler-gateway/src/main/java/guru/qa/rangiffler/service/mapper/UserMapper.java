@@ -1,13 +1,13 @@
 package guru.qa.rangiffler.service.mapper;
 
 import guru.qa.rangiffler.domain.UserGql;
-import guru.qa.rangiffler.grpc.User;
 import guru.qa.rangiffler.grpc.UserRequest;
+import guru.qa.rangiffler.grpc.UserResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-  User toProto(UserGql userGql);
+  UserResponse toProto(UserGql userGql);
 
   default UserRequest toUserRequest(UserGql userGql) {
     return UserRequest.newBuilder()
@@ -15,5 +15,5 @@ public interface UserMapper {
       .build();
   }
 
-  UserGql toGql(User user);
+  UserGql toGqlRequest(UserRequest user);
 }

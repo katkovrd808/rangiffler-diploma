@@ -45,9 +45,9 @@ public class GrpcUserdataClient extends RangifflerUserdataServiceGrpc.Rangiffler
   }
 
   @Nonnull
-  public List<UserGql> getAllUsers() {
+  public List<UserGql> getAllUsers(UserGql user) {
     try {
-      return rangifflerUserdataServiceBlockingStub.allUsers(EMPTY).getUserList()
+      return rangifflerUserdataServiceBlockingStub.allUsers(userMapper.toGqlRequest(user)).getUserList()
         .stream()
         .map(userMapper::toGql)
         .toList();

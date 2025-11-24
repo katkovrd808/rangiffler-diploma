@@ -27,8 +27,7 @@ service RangifflerCountriesService {
 }
 
 service RangifflerPostsService {
-    rpc GetFeed(google.protobuf.Empty) returns (FeedResponse);
-    rpc GetFeedWithFriends(FeedWithFriendsRequest) returns (FeedResponse);
+    rpc GetFeed(FeedRequest) returns (FeedResponse);
 }
 
 message PaginationRequest {
@@ -165,7 +164,11 @@ message Photo {
     PaginationRequest pagination_request = 6;
 }
 
-message Feed {
+message FeedRequest {
+    bool with_friends = 1;
+}
+
+message FeedResponse {
     repeated Photo photos = 1;
     Statistics stat = 2;
 }

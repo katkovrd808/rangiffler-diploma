@@ -8,9 +8,7 @@ CREATE TABLE IF NOT EXISTS "photo"
     description             varchar(255),
     photo                   bytea,
     created_date            date               NOT NULL DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id),
-    CONSTRAINT ph_user_id FOREIGN KEY (user_id) REFERENCES "user" (id),
-    CONSTRAINT ph_country_id FOREIGN KEY (country_id) REFERENCES "country" (id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS "like"
@@ -18,8 +16,7 @@ CREATE TABLE IF NOT EXISTS "like"
     id                      UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
     user_id                 UUID        NOT NULL,
     created_date            date        NOT NULL DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id),
-    CONSTRAINT like_user_id FOREIGN KEY (user_id) REFERENCES "user" (id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS "photo_like"
@@ -37,7 +34,5 @@ CREATE TABLE IF NOT EXISTS "statistic"
     user_id                 UUID        NOT NULL,
     country_id              UUID        NOT NULL,
     count                   int         NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT stat_user_id FOREIGN KEY (user_id) REFERENCES "user" (id),
-    CONSTRAINT stat_country_code FOREIGN KEY (country_id) REFERENCES "country" (id)
+    PRIMARY KEY (id)
 );

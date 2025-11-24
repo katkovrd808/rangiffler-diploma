@@ -168,14 +168,18 @@ message FeedRequest {
     bool with_friends = 1;
 }
 
+message StatisticsCountry {
+    uint32 count = 1;
+    string country_code = 2;
+}
+
 message FeedResponse {
     repeated Photo photos = 1;
     Statistics stat = 2;
 }
 
 message Statistics {
-    uint32 count = 1;
-    string country_id = 2;
+    repeated StatisticsCountry stat = 1;
 }
 
 enum FriendStatus {

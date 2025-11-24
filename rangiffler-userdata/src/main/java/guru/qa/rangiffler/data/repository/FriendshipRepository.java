@@ -18,155 +18,163 @@ public interface FriendshipRepository extends JpaRepository<FriendshipEntity, UU
   @Query(
     value = """
         SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-                                        u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
+            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
         FROM UserEntity u
         JOIN FriendshipEntity f
-        ON u = f.requester
-        WHERE (f.status IS NOT NULL)
-        AND f.addressee = :addressee
-        ORDER BY f.status DESC
+        ON (u = f.requester AND f.addressee = :user)
+           OR (u = f.addressee AND f.requester = :user)
+        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.ACCEPTED
+        ORDER BY u.username ASC
       """,
     countQuery = """
         SELECT COUNT(DISTINCT u)
         FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE (f.status IS NOT NULL)
-        AND f.addressee = :addressee
+        JOIN FriendshipEntity f
+        ON (u = f.requester AND f.addressee = :user)
+           OR (u = f.addressee AND f.requester = :user)
+        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.ACCEPTED
       """
   )
   @Nonnull
-  Page<UserWithStatus> findFriends(@Param("addressee") UserEntity addressee,
+  Page<UserWithStatus> findFriends(@Param("user") UserEntity user,
                                    Pageable pageable);
 
   @Query(
     value = """
         SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-                                        u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
+            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
         FROM UserEntity u
         JOIN FriendshipEntity f
-        ON u = f.requester
-        WHERE (f.status IS NOT NULL)
-        AND f.addressee = :addressee
-        AND (lower(u.username) like lower(concat('%', :searchQuery, '%'))
-              or lower(u.firstname) like lower(concat('%', :searchQuery, '%'))
-              or lower(u.surname) like lower(concat('%', :searchQuery, '%')))
-        ORDER BY f.status DESC
+        ON (u = f.requester AND f.addressee = :user)
+           OR (u = f.addressee AND f.requester = :user)
+        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.ACCEPTED
+        AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+              OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+              OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
+        ORDER BY u.username ASC
       """,
     countQuery = """
         SELECT COUNT(DISTINCT u)
         FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE (f.status IS NOT NULL)
-        AND f.addressee = :addressee
-        AND (lower(u.username) like lower(concat('%', :searchQuery, '%'))
-              or lower(u.firstname) like lower(concat('%', :searchQuery, '%'))
-              or lower(u.surname) like lower(concat('%', :searchQuery, '%')))
+        JOIN FriendshipEntity f
+        ON (u = f.requester AND f.addressee = :user)
+           OR (u = f.addressee AND f.requester = :user)
+        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.ACCEPTED
+        AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+              OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+              OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
       """
   )
   @Nonnull
-  Page<UserWithStatus> findFriends(@Param("addressee") UserEntity addressee,
+  Page<UserWithStatus> findFriends(@Param("user") UserEntity user,
                                    @Param("searchQuery") String searchQuery,
                                    Pageable pageable);
 
   @Query(
     value = """
-        SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.addressee = :currentUser
-        ORDER BY u.username
-    """,
+          SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
+              u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.requester
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.addressee = :user
+          ORDER BY u.username
+      """,
     countQuery = """
-        SELECT COUNT(DISTINCT u)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.addressee = :currentUser
-    """
+          SELECT COUNT(DISTINCT u)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.requester
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.addressee = :user
+      """
   )
   @Nonnull
-  Page<UserWithStatus> findIncomeInvitations(@Param("addressee") UserEntity addressee,
+  Page<UserWithStatus> findIncomeInvitations(@Param("user") UserEntity user,
                                              Pageable pageable);
 
   @Query(
     value = """
-        SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.addressee = :currentUser
-            AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
-        ORDER BY u.username
-    """,
+          SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
+              u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.requester
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.addressee = :user
+              AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
+          ORDER BY u.username
+      """,
     countQuery = """
-        SELECT COUNT(DISTINCT u)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.requester
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.addressee = :currentUser
-            AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
-    """
+          SELECT COUNT(DISTINCT u)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.requester
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.addressee = :user
+              AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
+      """
   )
   @Nonnull
-  Page<UserWithStatus> findIncomeInvitations(@Param("currentUser") UserEntity currentUser,
+  Page<UserWithStatus> findIncomeInvitations(@Param("user") UserEntity user,
                                              @Param("searchQuery") String searchQuery,
                                              @Nonnull Pageable pageable);
 
   @Query(
     value = """
-        SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.addressee
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.requester = :currentUser
-        ORDER BY u.username
-    """,
+          SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
+              u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.addressee
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.requester = :user
+          ORDER BY u.username
+      """,
     countQuery = """
-        SELECT COUNT(DISTINCT u)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.addressee
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.requester = :currentUser
-    """
+          SELECT COUNT(DISTINCT u)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.addressee
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.requester = :user
+      """
   )
   @Nonnull
-  Page<UserWithStatus> findOutcomeInvitations(@Param("currentUser") UserEntity currentUser,
+  Page<UserWithStatus> findOutcomeInvitations(@Param("user") UserEntity user,
                                               @Nonnull Pageable pageable);
 
   @Query(
     value = """
-        SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
-            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.addressee
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.requester = :currentUser
-            AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
-        ORDER BY u.username
-    """,
+          SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
+              u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.addressee
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.requester = :user
+              AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
+          ORDER BY u.username
+      """,
     countQuery = """
-        SELECT COUNT(DISTINCT u)
-        FROM UserEntity u
-        JOIN FriendshipEntity f ON u = f.addressee
-        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
-            AND f.requester = :currentUser
-            AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
-                OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
-    """
+          SELECT COUNT(DISTINCT u)
+          FROM UserEntity u
+          JOIN FriendshipEntity f ON u = f.addressee
+          WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.PENDING
+              AND f.requester = :user
+              AND (lower(u.username) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.firstname) LIKE lower(concat('%', :searchQuery, '%'))
+                  OR lower(u.surname) LIKE lower(concat('%', :searchQuery, '%')))
+      """
   )
   @Nonnull
-  Page<UserWithStatus> findOutcomeInvitations(@Param("currentUser") UserEntity currentUser,
+  Page<UserWithStatus> findOutcomeInvitations(@Param("user") UserEntity user,
                                               @Param("searchQuery") String searchQuery,
                                               @Nonnull Pageable pageable);
 }

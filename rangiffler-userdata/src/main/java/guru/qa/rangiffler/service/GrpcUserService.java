@@ -6,6 +6,7 @@ import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.UserJson;
 import guru.qa.rangiffler.service.api.GrpcCountriesClient;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Nonnull;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,10 +144,28 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
     responseObserver.onCompleted();
   }
 
+  @Nonnull
   private Pageable createPageable(PaginationRequest paginationRequest) {
-    return PageRequest.of(
-      paginationRequest.getPage(),
-      paginationRequest.getSize()
-    );
+    final int DEFAULT_PAGE = 0;
+    final int DEFAULT_SIZE = 20;
+    final int MAX_PAGE_SIZE = 100;
+
+    if (paginationRequest == null) {
+      LOG.info("### Using default pagination: page = {}, size = {}", DEFAULT_PAGE, DEFAULT_SIZE);
+      return PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE);
+    }
+
+    int originalPage = paginationRequest.getPage();
+    int originalSize = paginationRequest.getSize();
+
+    int page = Math.max(DEFAULT_PAGE, originalPage);
+    int size = Math.min(MAX_PAGE_SIZE, Math.max(1, originalSize));
+
+    if (originalPage != page || originalSize != size) {
+      LOG.debug("### Pagination parameters adjusted from page={}, size={} to page={}, size={} ###",
+        originalPage, originalSize, page, size);
+    }
+
+    return PageRequest.of(page, size);
   }
 }

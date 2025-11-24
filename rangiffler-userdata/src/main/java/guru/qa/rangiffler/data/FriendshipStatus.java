@@ -2,5 +2,7 @@ package guru.qa.rangiffler.data;
 
 public enum FriendshipStatus {
   PENDING,
-  ACCEPTED
+  ACCEPTED,
+  DECLINED,
+  DELETED
 }

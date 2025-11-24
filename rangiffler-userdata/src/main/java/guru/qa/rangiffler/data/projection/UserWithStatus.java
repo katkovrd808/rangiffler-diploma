@@ -14,7 +14,8 @@ public record UserWithStatus(
   String surname,
   byte[] photo,
   UUID countryId,
-  FriendshipStatus status
+  FriendshipStatus status,
+  boolean isRequester
 ) {
   public UserWithStatus {
   }
@@ -27,7 +28,21 @@ public record UserWithStatus(
       entity.getSurname(),
       entity.getPhoto(),
       entity.getCountryId(),
-      status
+      status,
+      false
+    );
+  }
+
+  public static UserWithStatus fromEntityWithRole(UserEntity entity, FriendshipStatus status, boolean isRequester) {
+    return new UserWithStatus(
+      entity.getId(),
+      entity.getUsername(),
+      entity.getFirstname(),
+      entity.getSurname(),
+      entity.getPhoto(),
+      entity.getCountryId(),
+      status,
+      isRequester
     );
   }
 }

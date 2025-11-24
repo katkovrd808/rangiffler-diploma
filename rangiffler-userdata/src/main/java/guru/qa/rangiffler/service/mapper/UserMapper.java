@@ -41,13 +41,14 @@ public interface UserMapper {
   default @Nonnull UsersPaginatedResponse toProtoList(Page<UserEntity> users) {
     return users.isEmpty() ? UsersPaginatedResponse.getDefaultInstance() :
       UsersPaginatedResponse.newBuilder().addAllUsers(
-        users.stream()
-          .map(this::toProto)
-          .collect(Collectors.toList()))
+          users.stream()
+            .map(this::toProto)
+            .collect(Collectors.toList()))
         .setPaginationResponse(createPaginationResponse(users))
-      .build();
+        .build();
   }
 
+  //TODO fix mapper for Invitation_Received status
   default @Nonnull Friend toProtoFriend(UserWithStatus user) {
     return user == null ? Friend.getDefaultInstance() :
       Friend.newBuilder()
@@ -57,26 +58,20 @@ public interface UserMapper {
         .setSurname(user.surname() != null ? user.surname() : "")
         .setPhoto(user.photo() != null ? map(user.photo()) : ByteString.EMPTY)
         .setCountryId(!user.countryId().toString().isEmpty() ? user.countryId().toString() : "")
-        .setStatus(user.status() == FriendshipStatus.PENDING ?
-          guru.qa.rangiffler.grpc.FriendStatus.INVITATION_SENT :
-          guru.qa.rangiffler.grpc.FriendStatus.FRIEND
-        )
+        .setStatus(resolveStatus(user))
         .build();
   }
 
-  default  @Nonnull FriendshipResponse toProtoFriendship(UserWithStatus user) {
+  default @Nonnull FriendshipResponse toProtoFriendship(UserWithStatus user) {
     return user == null ? FriendshipResponse.getDefaultInstance() :
       FriendshipResponse.newBuilder()
         .setId(user.id().toString())
         .setUsername(user.username())
-        .setStatus(user.status() == FriendshipStatus.PENDING ?
-          guru.qa.rangiffler.grpc.FriendStatus.INVITATION_SENT :
-          guru.qa.rangiffler.grpc.FriendStatus.FRIEND
-          )
+        .setStatus(resolveStatus(user))
         .build();
   }
 
-  default  @Nonnull AllFriendsPaginatedResponse toProtoFriendsList(Page<UserWithStatus> friends) {
+  default @Nonnull AllFriendsPaginatedResponse toProtoFriendsList(Page<UserWithStatus> friends) {
     return friends.isEmpty() ? AllFriendsPaginatedResponse.getDefaultInstance() :
       AllFriendsPaginatedResponse.newBuilder().addAllFriends(
           friends.stream()
@@ -86,7 +81,7 @@ public interface UserMapper {
         .build();
   }
 
-  default  @Nonnull InvitationsPaginatedResponse toProtoInvitationsList(Page<UserWithStatus> friends) {
+  default @Nonnull InvitationsPaginatedResponse toProtoInvitationsList(Page<UserWithStatus> friends) {
     return friends.isEmpty() ? InvitationsPaginatedResponse.getDefaultInstance() :
       InvitationsPaginatedResponse.newBuilder().addAllInvitations(
           friends.stream()
@@ -96,11 +91,11 @@ public interface UserMapper {
         .build();
   }
 
-  default  @Nonnull ByteString map(@Nullable byte[] value) {
+  private @Nonnull ByteString map(@Nullable byte[] value) {
     return value == null ? ByteString.EMPTY : ByteString.copyFrom(value);
   }
 
-  default @Nonnull PaginationResponse createPaginationResponse(Page<?> page) {
+  private @Nonnull PaginationResponse createPaginationResponse(Page<?> page) {
     return PaginationResponse.newBuilder()
       .setCurrentPage(page.getNumber())
       .setPageSize(page.getSize())
@@ -109,5 +104,13 @@ public interface UserMapper {
       .setHasNext(page.hasNext())
       .setHasPrevious(page.hasPrevious())
       .build();
+  }
+
+  private @Nonnull guru.qa.rangiffler.grpc.FriendStatus resolveStatus(UserWithStatus user) {
+    return switch (user.status()) {
+      case ACCEPTED -> FriendStatus.FRIEND;
+      case PENDING -> user.isRequester() ? FriendStatus.INVITATION_SENT : FriendStatus.INVITATION_RECEIVED;
+      case DECLINED, DELETED -> FriendStatus.NOT_FRIEND;
+    };
   }
 }

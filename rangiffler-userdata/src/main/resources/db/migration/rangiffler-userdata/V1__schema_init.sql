@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "user"
     PRIMARY KEY (id)
 );
 
-create table if not exists "friendship"
+CREATE TABLE IF NOT EXISTS "friendship"
 (
     requester_id UUID    NOT NULL,
     addressee_id UUID    NOT NULL,

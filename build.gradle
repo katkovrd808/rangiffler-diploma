@@ -47,6 +47,7 @@ subprojects {
         h2Version = '2.3.232'
         mockitoVersion = '5.17.0'
         mapStructVersion = '1.5.5.Final'
+        geoip2Version = '5.0.0'
     }
 
     tasks.withType(Test).configureEach {

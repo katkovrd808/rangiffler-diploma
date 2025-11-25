@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/rangiffler-diploma.iml" filepath="$PROJECT_DIR$/.idea/rangiffler-diploma.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-grpc-common/rangiffler-diploma.rangiffler-grpc-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-grpc-common/rangiffler-diploma.rangiffler-grpc-common.main.iml" />

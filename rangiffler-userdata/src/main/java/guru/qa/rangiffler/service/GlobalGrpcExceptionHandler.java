@@ -20,12 +20,12 @@ public class GlobalGrpcExceptionHandler implements GrpcExceptionHandler {
     Status status = switch (exception) {
       case UserNotFoundException e -> NOT_FOUND;
       case SameUsernameException e -> INVALID_ARGUMENT;
-      case IllegalArgumentException e -> INVALID_ARGUMENT;
       case UnsupportedOperationException e -> Status.UNIMPLEMENTED;
       case NotFoundException e -> NOT_FOUND;
       case StatusRuntimeException e -> Status.UNAVAILABLE;
       case InvalidFriendshipOperationException e -> INVALID_ARGUMENT;
       case FriendshipNotFoundException e -> NOT_FOUND;
+      case IllegalArgumentException e -> INVALID_ARGUMENT;
       default -> INTERNAL;
     };
 

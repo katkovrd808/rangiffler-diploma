@@ -52,7 +52,7 @@ public class DbPhotoService implements PhotoService {
       throw new IllegalArgumentException("User can't be null.");
     }
 
-    final CountryDto country = grpcCountriesClient.getCountryId(request.getCountryCode());
+    final CountryDto country = grpcCountriesClient.getCountryByCode(request.getCountryCode());
     LOG.info("### Received country with id: {} and code: {} from countries service###", country.id(), country.code());
 
     Optional<UserDto> user = grpcUserdataClient.getUserById(request.getUserId());

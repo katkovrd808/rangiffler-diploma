@@ -1,7 +1,6 @@
 package guru.qa.rangiffler.service.mapper;
 
 import com.google.protobuf.ByteString;
-import guru.qa.rangiffler.data.FriendshipStatus;
 import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.grpc.*;
@@ -48,7 +47,6 @@ public interface UserMapper {
         .build();
   }
 
-  //TODO fix mapper for Invitation_Received status
   default @Nonnull Friend toProtoFriend(UserWithStatus user) {
     return user == null ? Friend.getDefaultInstance() :
       Friend.newBuilder()
@@ -62,7 +60,7 @@ public interface UserMapper {
         .build();
   }
 
-  default @Nonnull FriendshipResponse toProtoFriendship(UserWithStatus user) {
+  default @Nonnull FriendshipResponse toProtoFriendshipResponse(UserWithStatus user) {
     return user == null ? FriendshipResponse.getDefaultInstance() :
       FriendshipResponse.newBuilder()
         .setId(user.id().toString())
@@ -71,7 +69,7 @@ public interface UserMapper {
         .build();
   }
 
-  default @Nonnull AllFriendsPaginatedResponse toProtoFriendsList(Page<UserWithStatus> friends) {
+  default @Nonnull AllFriendsPaginatedResponse toProtoFriendsListResponse(Page<UserWithStatus> friends) {
     return friends.isEmpty() ? AllFriendsPaginatedResponse.getDefaultInstance() :
       AllFriendsPaginatedResponse.newBuilder().addAllFriends(
           friends.stream()
@@ -109,7 +107,7 @@ public interface UserMapper {
   private @Nonnull guru.qa.rangiffler.grpc.FriendStatus resolveStatus(UserWithStatus user) {
     return switch (user.status()) {
       case ACCEPTED -> FriendStatus.FRIEND;
-      case PENDING -> user.isRequester() ? FriendStatus.INVITATION_SENT : FriendStatus.INVITATION_RECEIVED;
+      case PENDING -> user.isAddressee() ? FriendStatus.INVITATION_SENT : FriendStatus.INVITATION_RECEIVED;
       case DECLINED, DELETED -> FriendStatus.NOT_FRIEND;
     };
   }

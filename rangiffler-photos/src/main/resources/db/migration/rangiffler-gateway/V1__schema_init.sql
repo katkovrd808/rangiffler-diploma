@@ -1,8 +1,6 @@
-CREATE extension IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS "photo"
 (
-    id                      UUID        UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                      UUID        UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     user_id                 UUID               NOT NULL,
     country_id              UUID               NOT NULL,
     description             varchar(255),
@@ -13,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "photo"
 
 CREATE TABLE IF NOT EXISTS "like"
 (
-    id                      UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                      UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     user_id                 UUID        NOT NULL,
     created_date            date        NOT NULL DEFAULT CURRENT_DATE,
     PRIMARY KEY (id)
@@ -30,7 +28,7 @@ CREATE TABLE IF NOT EXISTS "photo_like"
 
 CREATE TABLE IF NOT EXISTS "statistic"
 (
-    id                      UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                      UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     user_id                 UUID        NOT NULL,
     country_id              UUID        NOT NULL,
     count                   int         NOT NULL,

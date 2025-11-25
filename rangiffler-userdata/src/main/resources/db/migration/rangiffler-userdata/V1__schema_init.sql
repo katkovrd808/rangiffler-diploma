@@ -1,8 +1,6 @@
-CREATE extension IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS "user"
 (
-    id                      UUID        UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                      UUID        UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     username                varchar(50) UNIQUE NOT NULL,
     firstname               varchar(255),
     surname                 varchar(255),

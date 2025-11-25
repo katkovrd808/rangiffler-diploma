@@ -30,7 +30,7 @@ public class PhotoEntity {
   @Column
   private byte[] photo;
 
-  @Column(name = "created_date", columnDefinition = "DATE default CURRENT_DATE", insertable = false)
+  @Column(name = "created_date", columnDefinition = "DATE", insertable = false)
   private Date createdDate;
 
   @Override

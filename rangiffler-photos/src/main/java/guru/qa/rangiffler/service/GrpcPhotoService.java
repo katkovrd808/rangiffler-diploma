@@ -1,5 +1,6 @@
 package guru.qa.rangiffler.service;
 
+import com.google.protobuf.Empty;
 import guru.qa.rangiffler.grpc.*;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -22,6 +23,20 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   @Override
   public void addPhoto(PhotoRequest request, StreamObserver<PhotoResponse> responseObserver) {
     PhotoResponse response = photoService.createPhoto(request);
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void updatePhoto(PhotoUpdateRequest request, StreamObserver<PhotoResponse> responseObserver) {
+    PhotoResponse response = photoService.updatePhoto(request);
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void deletePhoto(PhotoDeleteRequest request, StreamObserver<Empty> responseObserver) {
+    Empty response = photoService.deletePhoto(request);
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

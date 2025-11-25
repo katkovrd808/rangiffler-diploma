@@ -6,6 +6,7 @@ import guru.qa.rangiffler.model.CountryDto;
 import org.mapstruct.Mapper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -18,11 +19,11 @@ public interface CountryMapper {
         .build();
   }
 
-  default CountryDto toDto(CountryResponse response) {
-    return new CountryDto(
+  default Optional<CountryDto> toDto(CountryResponse response) {
+    return Optional.of(new CountryDto(
       UUID.fromString(response.getId()),
       response.getName(),
       response.getCode()
-    );
+    ));
   }
 }

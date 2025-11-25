@@ -4,6 +4,7 @@ import guru.qa.rangiffler.grpc.CountryRequest;
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
 import guru.qa.rangiffler.model.CountryDto;
 import guru.qa.rangiffler.service.mapper.CountryMapper;
+import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @Component
 @ParametersAreNonnullByDefault
@@ -31,13 +33,18 @@ public class GrpcCountriesClient {
   }
 
   @Nonnull
-  public CountryDto getCountryByCode(String code) {
+  public Optional<CountryDto> getCountryByCode(String countryCode) {
     try {
-      CountryRequest request = countryMapper.toProto(code);
+      CountryRequest request = countryMapper.toProto(countryCode);
       return countryMapper.toDto(rangifflerCountriesServiceBlockingStub.getCountry(request));
     } catch (StatusRuntimeException e) {
       LOG.error("### Error while calling gRPC server ", e);
-      throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled or Countries service unavailable", e);
+      Status.Code code = e.getStatus().getCode();
+      if (code == Status.Code.NOT_FOUND || code == Status.Code.INVALID_ARGUMENT) {
+        return Optional.empty();
+      } else {
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled or Userdata service unavailable", e);
+      }
     }
   }
 }

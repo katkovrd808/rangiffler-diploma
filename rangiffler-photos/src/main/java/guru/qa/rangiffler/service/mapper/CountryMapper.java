@@ -5,6 +5,7 @@ import guru.qa.rangiffler.grpc.CountryResponse;
 import guru.qa.rangiffler.model.CountryDto;
 import org.mapstruct.Mapper;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,10 +13,11 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 @ParametersAreNonnullByDefault
 public interface CountryMapper {
-  default CountryRequest toProto(String code) {
-    return code == null ? CountryRequest.getDefaultInstance() :
+  default CountryRequest toProto(@Nullable String id, @Nullable String code) {
+    return code == null && id == null ? CountryRequest.getDefaultInstance() :
       CountryRequest.newBuilder()
-        .setCode(code)
+        .setId(id == null ? "" : id)
+        .setCode(code == null ? "" : code)
         .build();
   }
 
@@ -23,7 +25,8 @@ public interface CountryMapper {
     return Optional.of(new CountryDto(
       UUID.fromString(response.getId()),
       response.getName(),
-      response.getCode()
+      response.getCode(),
+      response.getFlag().toByteArray()
     ));
   }
 }

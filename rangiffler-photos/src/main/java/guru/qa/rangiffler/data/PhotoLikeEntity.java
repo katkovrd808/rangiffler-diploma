@@ -11,24 +11,18 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "photo")
-public class PhotoEntity {
+@Table(name = "photo_like")
+public class PhotoLikeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id", nullable = false, columnDefinition = "UUID default gen_random_uuid()")
   private UUID id;
 
-  @Column(name = "user_id", nullable = false)
+  @Column(name = "user_id")
   private UUID userId;
 
-  @Column(name = "country_id", nullable = false)
-  private UUID countryId;
-
-  @Column
-  private String description;
-
-  @Column(columnDefinition = "bytea")
-  private byte[] photo;
+  @Column(name = "photo_id")
+  private UUID photoId;
 
   @Column(name = "created_date", columnDefinition = "DATE", insertable = false)
   private Date createdDate;
@@ -38,7 +32,7 @@ public class PhotoEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    PhotoEntity that = (PhotoEntity) o;
+    PhotoLikeEntity that = (PhotoLikeEntity) o;
     return getId() != null && Objects.equals(getId(), that.getId());
   }
 

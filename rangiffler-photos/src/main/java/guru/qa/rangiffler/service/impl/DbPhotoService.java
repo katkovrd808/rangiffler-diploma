@@ -57,8 +57,8 @@ public class DbPhotoService implements PhotoService {
       throw new IllegalArgumentException("User can't be null.");
     }
 
-    CountryDto country = getCountryDto(request.getCountryCode());
-    getUserDto(request.getUserId());
+    final CountryDto country = getCountryDto(request.getCountryCode());
+    assertUserCreated(request.getUserId());
 
     PhotoEntity pe = new PhotoEntity();
     pe.setUserId(UUID.fromString(request.getUserId()));
@@ -66,29 +66,30 @@ public class DbPhotoService implements PhotoService {
     pe.setDescription(request.getDescription());
     pe.setPhoto(request.getSrc().toByteArray());
 
-    return photoMapper.toProto(photoRepository.save(pe));
+    return photoMapper.toProto(photoRepository.save(pe), country);
   }
 
-  @Nonnull
   @Override
-  public PhotoResponse updatePhoto(PhotoUpdateRequest request) {
+  @Transactional
+  public @Nonnull PhotoResponse updatePhoto(PhotoUpdateRequest request) {
     PhotoEntity pe = getRequiredPhoto(request.getId());
     if (!Objects.equals(pe.getUserId(), UUID.fromString(request.getUserId()))) {
       throw new SecurityException("User can only update their own photos.");
     }
 
-    CountryDto country = getCountryDto(request.getCountryCode());
-    getUserDto(request.getUserId());
+    final CountryDto country = getCountryDto(request.getCountry().getCode());
+    assertUserCreated(request.getUserId());
 
     pe.setCountryId(country.id());
     pe.setDescription(request.getDescription());
     pe.setPhoto(request.getSrc().toByteArray());
 
-    return photoMapper.toProto(photoRepository.save(pe));
+    return photoMapper.toProto(photoRepository.save(pe), country);
   }
 
   @Override
-  public Empty deletePhoto(PhotoDeleteRequest request) {
+  @Transactional
+  public @Nonnull Empty deletePhoto(PhotoDeleteRequest request) {
     PhotoEntity pe = getRequiredPhoto(request.getId());
     if (!Objects.equals(pe.getUserId(), UUID.fromString(request.getUserId()))) {
       throw new SecurityException("User can only update their own photos.");
@@ -100,8 +101,7 @@ public class DbPhotoService implements PhotoService {
     return Empty.getDefaultInstance();
   }
 
-  @Nonnull
-  private CountryDto getCountryDto(String code) {
+  private @Nonnull CountryDto getCountryDto(String code) {
     final Optional<CountryDto> country = grpcCountriesClient.getCountryByCode(code);
     if (country.isEmpty()) {
       LOG.info("### Requested country with code: {} was not found in userdata-db ###", code);
@@ -112,20 +112,17 @@ public class DbPhotoService implements PhotoService {
     return country.get();
   }
 
-  @Nonnull
-  private UserDto getUserDto(String id) {
+  private @Nonnull PhotoEntity getRequiredPhoto(String id) {
+    return photoRepository.findById(UUID.fromString(id))
+      .orElseThrow(() -> new PhotoNotFoundException("Can't find photo with id " + id));
+  }
+
+  private void assertUserCreated(String id) {
     Optional<UserDto> user = grpcUserdataClient.getUserById(id);
     if (user.isEmpty()) {
       LOG.info("### Requested user with id: {} was not found in userdata-db ###", id);
       throw new IllegalArgumentException("User with id " + id + " was not found.");
     }
     LOG.info("### Received user with id: {} and username: {} from userdata service###", user.get().id(), user.get().username());
-    return user.get();
-  }
-
-  @Nonnull
-  private PhotoEntity getRequiredPhoto(String id) {
-    return photoRepository.findById(UUID.fromString(id))
-      .orElseThrow(() -> new PhotoNotFoundException("Can't find photo with id " + id));
   }
 }

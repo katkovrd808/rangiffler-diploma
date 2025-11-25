@@ -35,7 +35,23 @@ public class GrpcCountriesClient {
   @Nonnull
   public Optional<CountryDto> getCountryByCode(String countryCode) {
     try {
-      CountryRequest request = countryMapper.toProto(countryCode);
+      CountryRequest request = countryMapper.toProto(null, countryCode);
+      return countryMapper.toDto(rangifflerCountriesServiceBlockingStub.getCountry(request));
+    } catch (StatusRuntimeException e) {
+      LOG.error("### Error while calling gRPC server ", e);
+      Status.Code code = e.getStatus().getCode();
+      if (code == Status.Code.NOT_FOUND || code == Status.Code.INVALID_ARGUMENT) {
+        return Optional.empty();
+      } else {
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled or Userdata service unavailable", e);
+      }
+    }
+  }
+
+  @Nonnull
+  public Optional<CountryDto> getCountryById(String id) {
+    try {
+      CountryRequest request = countryMapper.toProto(id, null);
       return countryMapper.toDto(rangifflerCountriesServiceBlockingStub.getCountry(request));
     } catch (StatusRuntimeException e) {
       LOG.error("### Error while calling gRPC server ", e);

@@ -15,5 +15,5 @@ public interface PhotoService {
 
   @Nonnull PhotoResponse updatePhoto(PhotoUpdateRequest photo);
 
-  Empty deletePhoto(PhotoDeleteRequest photo);
+  @Nonnull Empty deletePhoto(PhotoDeleteRequest photo);
 }

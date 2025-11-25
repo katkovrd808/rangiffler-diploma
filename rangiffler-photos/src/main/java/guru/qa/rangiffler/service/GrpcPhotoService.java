@@ -14,10 +14,12 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   private static final Logger LOG = LoggerFactory.getLogger(GrpcPhotoService.class);
 
   private final PhotoService photoService;
+  private final PhotoLikeService photoLikeService;
 
   @Autowired
-  public GrpcPhotoService(PhotoService photoService) {
+  public GrpcPhotoService(PhotoService photoService, PhotoLikeService photoLikeService) {
     this.photoService = photoService;
+    this.photoLikeService = photoLikeService;
   }
 
   @Override
@@ -42,7 +44,16 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   }
 
   @Override
-  public void getFeed(FeedRequest request, StreamObserver<FeedResponse> responseObserver) {
-    super.getFeed(request, responseObserver);
+  public void addPhotoLike(PhotoLikeRequest request, StreamObserver<PhotoResponse> responseObserver) {
+    PhotoResponse response = photoLikeService.likePhoto(request);
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void deletePhotoLike(PhotoLikeRequest request, StreamObserver<Empty> responseObserver) {
+    Empty response = photoLikeService.deleteLike(request);
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
 }

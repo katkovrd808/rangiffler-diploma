@@ -71,7 +71,7 @@ public class RegisterController {
       try {
         String clientIP = getClientIP(request);
         String countryCode = geoLocationService.countryCountryCodeByIP(clientIP);
-        LOG.info("### Received request from IP: {}, and country code: {}###", clientIP, countryCode);
+        LOG.info("### Received request from IP: {} with country code: {}###", clientIP, countryCode);
         registeredUserName = userService.registerUser(
           registrationModel.username(),
           registrationModel.password(),
@@ -79,6 +79,7 @@ public class RegisterController {
         );
         response.setStatus(HttpServletResponse.SC_CREATED);
         model.addAttribute(MODEL_USERNAME_ATTR, registeredUserName);
+        model.addAttribute(MODEL_FRONT_URI_ATTR, rangifflerFrontUri);
       } catch (DataIntegrityViolationException e) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         addErrorToRegistrationModel(

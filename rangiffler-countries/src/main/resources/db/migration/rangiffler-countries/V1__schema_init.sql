@@ -1,8 +1,6 @@
-CREATE extension IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS "country"
 (
-    id                    UUID        UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                    UUID        UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     iso_code              varchar(50)        NOT NULL CHECK(
         iso_code ~ '^[A-Z]{2,3}$'
     ),

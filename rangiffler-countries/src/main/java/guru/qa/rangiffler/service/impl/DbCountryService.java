@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @ParametersAreNonnullByDefault
@@ -38,6 +39,17 @@ public class DbCountryService implements CountryService {
     return countryRepository.findByIsoCode(isoCode.toUpperCase())
       .map(countryMapper::toProto)
       .orElseThrow(() -> new CountryNotFoundException("Can't find country with iso code: " + isoCode));
+  }
+
+  @Nonnull
+  @Override
+  public CountryResponse findById(String id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Id can't be null value.");
+    }
+    return countryRepository.findById(UUID.fromString(id))
+      .map(countryMapper::toProto)
+      .orElseThrow(() -> new CountryNotFoundException("Can't find country with id: " + id));
   }
 
   @Override

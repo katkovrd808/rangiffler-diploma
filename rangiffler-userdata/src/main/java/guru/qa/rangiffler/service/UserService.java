@@ -11,6 +11,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public interface UserService {
   @Nonnull UserResponse getCurrentUser(String username);
 
+  @Nonnull UserResponse findById(String id);
+
   @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username);
 
   @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user);

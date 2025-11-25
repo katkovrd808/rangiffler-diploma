@@ -24,7 +24,7 @@ public class FriendshipEntity {
   @JoinColumn(name = "addressee_id", referencedColumnName = "id")
   private UserEntity addressee;
 
-  @Column(name = "created_date", columnDefinition = "DATE", nullable = false)
+  @Column(name = "created_date", columnDefinition = "DATE", nullable = false, insertable = false)
   private Date createdDate;
 
   @Enumerated(EnumType.STRING)

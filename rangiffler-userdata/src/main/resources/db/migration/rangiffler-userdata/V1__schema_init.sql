@@ -1,8 +1,6 @@
-CREATE extension IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS "user"
 (
-    id                      UUID        UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    id                      UUID        UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     username                varchar(50) UNIQUE NOT NULL,
     firstname               varchar(255),
     surname                 varchar(255),
@@ -13,9 +11,9 @@ CREATE TABLE IF NOT EXISTS "user"
 
 CREATE TABLE IF NOT EXISTS "friendship"
 (
-    requester_id UUID    NOT NULL,
-    addressee_id UUID    NOT NULL,
-    created_date date      NOT NULL,
+    requester_id UUID          NOT NULL,
+    addressee_id UUID          NOT NULL,
+    created_date date          NOT NULL DEFAULT CURRENT_DATE,
     status varchar(50)         NOT NULL,
     PRIMARY KEY (requester_id, addressee_id),
     CONSTRAINT friend_are_distinct_ck CHECK (requester_id <> addressee_id),

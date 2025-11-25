@@ -12,5 +12,8 @@ public interface CountryService {
   CountryResponse findByIsoCode(String isoCode);
 
   @Nonnull
+  CountryResponse findById(String id);
+
+  @Nonnull
   CountriesResponse allCountries();
 }

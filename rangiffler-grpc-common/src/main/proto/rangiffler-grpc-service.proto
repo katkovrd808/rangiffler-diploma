@@ -26,6 +26,14 @@ service RangifflerCountriesService {
     rpc AllCountries(google.protobuf.Empty) returns (CountriesResponse);
 }
 
+service RangifflerPhotosService {
+    rpc AddPhoto(PhotoRequest) returns (PhotoResponse);
+    rpc UpdatePhoto(PhotoUpdateRequest) returns (PhotoResponse);
+    rpc DeletePhoto(PhotoDeleteRequest) returns (google.protobuf.Empty);
+    rpc AddPhotoLike(PhotoLikeRequest) returns (PhotoResponse);
+    rpc DeletePhotoLike(PhotoLikeRequest) returns (google.protobuf.Empty);
+}
+
 message PaginationRequest {
     int32 page = 1;
     int32 size = 2;
@@ -59,6 +67,7 @@ message UserUpdateResponse {
 
 message UserRequest {
     string username = 1;
+    optional string id = 2;
 }
 
 message UserResponse {
@@ -129,6 +138,7 @@ message InvitationsPaginatedResponse {
 
 message CountryRequest {
     string code = 1;
+    optional string id = 2;
 }
 
 message CountryResponse {
@@ -138,8 +148,53 @@ message CountryResponse {
     bytes flag = 4;
 }
 
+message CountryPhoto {
+    string name = 1;
+    string code = 2;
+    bytes flag = 3;
+}
+
 message CountriesResponse {
     repeated CountryResponse countries = 1;
+}
+
+message Like {
+    string user_id = 1;
+}
+
+message PhotoRequest {
+    string user_id = 1;
+    string country_code = 2;
+    string description = 3;
+    bytes src = 4;
+    optional Like like = 5;
+}
+
+message PhotoDeleteRequest {
+    string id = 1;
+    string user_id = 2;
+}
+
+message PhotoUpdateRequest {
+    string id = 1;
+    string user_id = 2;
+    string description = 4;
+    bytes src = 5;
+    CountryPhoto country = 3;
+}
+
+message PhotoResponse {
+    string id = 1;
+    string user_id = 2;
+    string description = 4;
+    bytes src = 5;
+    CountryPhoto country = 3;
+    repeated Like likes = 6;
+}
+
+message PhotoLikeRequest {
+    string photo_id = 1;
+    Like like = 2;
 }
 
 enum FriendStatus {

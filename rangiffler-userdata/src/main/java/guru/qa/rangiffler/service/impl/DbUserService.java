@@ -6,14 +6,9 @@ import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.data.repository.FriendshipRepository;
 import guru.qa.rangiffler.data.repository.UserRepository;
-import guru.qa.rangiffler.ex.FriendshipNotFoundException;
-import guru.qa.rangiffler.ex.InvalidFriendshipOperationException;
-import guru.qa.rangiffler.ex.SameUsernameException;
-import guru.qa.rangiffler.ex.UserNotFoundException;
+import guru.qa.rangiffler.ex.*;
 import guru.qa.rangiffler.grpc.*;
-import guru.qa.rangiffler.service.GrpcUserService;
 import guru.qa.rangiffler.service.UserService;
-import guru.qa.rangiffler.service.api.GrpcCountriesClient;
 import guru.qa.rangiffler.service.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +29,7 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 public class DbUserService implements UserService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GrpcUserService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbUserService.class);
 
   private final UserRepository userRepository;
   private final FriendshipRepository friendshipRepository;
@@ -43,7 +38,6 @@ public class DbUserService implements UserService {
   @Autowired
   public DbUserService(UserRepository userRepository,
                        FriendshipRepository friendshipRepository,
-                       GrpcCountriesClient grpcCountriesClient,
                        UserMapper userMapper) {
     this.userRepository = userRepository;
     this.friendshipRepository = friendshipRepository;
@@ -55,7 +49,15 @@ public class DbUserService implements UserService {
   public @Nonnull UserResponse getCurrentUser(String username) {
     return userRepository.findByUsername(username)
       .map(userMapper::toProto)
-      .orElseThrow(() -> new UserNotFoundException("Can't find user with username " + username));
+      .orElseThrow(() -> new UserNotFoundException("Can't find user with username: " + username));
+  }
+
+  @Nonnull
+  @Override
+  public UserResponse findById(String id) {
+    return userRepository.findById(UUID.fromString(id))
+      .map(userMapper::toProto)
+      .orElseThrow(() -> new UserNotFoundException("Can't find user with id: " + id));
   }
 
   @Override
@@ -70,7 +72,7 @@ public class DbUserService implements UserService {
   public @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user) {
     UserEntity ue = getRequiredUser(user.getUsername());
     if (!Objects.equals(ue.getUsername(), user.getUsername())) {
-      throw new SecurityException("User can only update their own profile");
+      throw new SecurityException("User can only update their own profile.");
     }
     ue.setFirstname(user.hasFirstname() ? user.getFirstname() : "");
     ue.setSurname(user.hasSurname() ? user.getSurname() : "");
@@ -92,7 +94,7 @@ public class DbUserService implements UserService {
     Page<UserWithStatus> users = searchQuery == null ?
       friendshipRepository.findFriends(ue, pageable) :
       friendshipRepository.findFriends(ue, searchQuery, pageable);
-    return userMapper.toProtoFriendsList(users);
+    return userMapper.toProtoFriendsListResponse(users);
   }
 
   @Override
@@ -125,6 +127,7 @@ public class DbUserService implements UserService {
     return userMapper.toProtoInvitationsList(users);
   }
 
+  //TODO обрабатывать статус друга при создании дружбы: INVITATION_SEND
   @Override
   @Transactional
   public @Nonnull FriendshipResponse sendFriendshipRequest(String username, String targetUsername) {
@@ -142,6 +145,9 @@ public class DbUserService implements UserService {
       FriendshipStatus status = fe.getStatus();
 
       if (status == FriendshipStatus.PENDING) {
+        if (fe.getRequester().equals(user)) {
+          throw new InvalidFriendshipOperationException("Friendship request to user " + targetUsername + " is already exists.");
+        }
         if (fe.getAddressee().equals(user)) {
           fe.setStatus(FriendshipStatus.ACCEPTED);
           friendshipStatusToSet = FriendshipStatus.ACCEPTED;
@@ -160,9 +166,9 @@ public class DbUserService implements UserService {
     userRepository.save(user);
     userRepository.save(target);
 
-    UserWithStatus invited = UserWithStatus.fromEntity(target, friendshipStatusToSet);
+    UserWithStatus invited = UserWithStatus.fromEntity(target, friendshipStatusToSet, true);
 
-    return userMapper.toProtoFriendship(invited);
+    return userMapper.toProtoFriendshipResponse(invited);
   }
 
   @Override
@@ -204,7 +210,7 @@ public class DbUserService implements UserService {
 
     UserWithStatus accepted = UserWithStatus.fromEntity(target, friendshipStatusToSet);
 
-    return userMapper.toProtoFriendship(accepted);
+    return userMapper.toProtoFriendshipResponse(accepted);
   }
 
   @Override
@@ -228,8 +234,6 @@ public class DbUserService implements UserService {
       throw new InvalidFriendshipOperationException("User is not part of this friendship request");
     }
 
-    boolean isRequester = friendship.getRequester().equals(user);
-
     LOG.info("### Attempting to delete friendship: requester={}, addressee={}, status={} ###",
       friendship.getRequester(), friendship.getAddressee(), friendship.getStatus()
     );
@@ -245,8 +249,8 @@ public class DbUserService implements UserService {
     friendshipRepository.delete(friendship);
     friendshipRepository.flush();
 
-    UserWithStatus declined = UserWithStatus.fromEntityWithRole(target, FriendshipStatus.DECLINED, isRequester);
-    return userMapper.toProtoFriendship(declined);
+    UserWithStatus declined = UserWithStatus.fromEntity(target, FriendshipStatus.DECLINED);
+    return userMapper.toProtoFriendshipResponse(declined);
   }
 
   @Override
@@ -285,14 +289,13 @@ public class DbUserService implements UserService {
     userRepository.save(target);
 
     friendshipRepository.delete(friendship);
-
     friendshipRepository.flush();
 
-    UserWithStatus declined = UserWithStatus.fromEntityWithRole(target, FriendshipStatus.DECLINED, isRequester);
-    return userMapper.toProtoFriendship(declined);
+    UserWithStatus declined = UserWithStatus.fromEntity(target, FriendshipStatus.DECLINED, isRequester);
+    return userMapper.toProtoFriendshipResponse(declined);
   }
 
-  //TODO validate photo
+  //TODO move to GATEWAY SERVICE
   public static boolean isPhotoString(String photo) {
     return photo != null && photo.startsWith("data:image");
   }

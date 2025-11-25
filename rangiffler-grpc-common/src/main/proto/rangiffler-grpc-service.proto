@@ -133,6 +133,7 @@ message InvitationsPaginatedResponse {
 
 message CountryRequest {
     string code = 1;
+    optional string id = 2;
 }
 
 message CountryResponse {

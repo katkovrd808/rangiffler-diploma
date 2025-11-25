@@ -24,7 +24,7 @@ public class GrpcCountryService extends RangifflerCountriesServiceGrpc.Rangiffle
 
   @Override
   public void getCountry(CountryRequest request, StreamObserver<CountryResponse> responseObserver) {
-    CountryResponse response = countryService.findByIsoCode(request.getCode());
+    CountryResponse response = request.hasId() ? countryService.findById(request.getId()) : countryService.findByIsoCode(request.getCode());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

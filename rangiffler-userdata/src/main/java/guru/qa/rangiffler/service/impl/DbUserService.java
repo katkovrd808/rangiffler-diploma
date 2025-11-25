@@ -72,7 +72,7 @@ public class DbUserService implements UserService {
   public @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user) {
     UserEntity ue = getRequiredUser(user.getUsername());
     if (!Objects.equals(ue.getUsername(), user.getUsername())) {
-      throw new SecurityException("User can only update their own profile");
+      throw new SecurityException("User can only update their own profile.");
     }
     ue.setFirstname(user.hasFirstname() ? user.getFirstname() : "");
     ue.setSurname(user.hasSurname() ? user.getSurname() : "");
@@ -289,7 +289,6 @@ public class DbUserService implements UserService {
     userRepository.save(target);
 
     friendshipRepository.delete(friendship);
-
     friendshipRepository.flush();
 
     UserWithStatus declined = UserWithStatus.fromEntity(target, FriendshipStatus.DECLINED, isRequester);

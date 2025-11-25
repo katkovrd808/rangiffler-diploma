@@ -4,7 +4,7 @@ import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.repository.UserRepository;
 import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.UserJson;
-import guru.qa.rangiffler.service.api.GrpcCountriesClient;
+import guru.qa.rangiffler.api.GrpcCountriesClient;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Nonnull;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -74,7 +74,7 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
   @Override
   public void getUser(UserRequest request, StreamObserver<UserResponse> responseObserver) {
-    UserResponse response = userService.getCurrentUser(request.getUsername());
+    UserResponse response = request.hasId() ? userService.findById(request.getId()) : userService.getCurrentUser(request.getUsername());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

@@ -26,7 +26,8 @@ service RangifflerCountriesService {
     rpc AllCountries(google.protobuf.Empty) returns (CountriesResponse);
 }
 
-service RangifflerPostsService {
+service RangifflerPhotosService {
+    rpc AddPhoto(PhotoRequest) returns (PhotoResponse);
     rpc GetFeed(FeedRequest) returns (FeedResponse);
 }
 
@@ -63,6 +64,7 @@ message UserUpdateResponse {
 
 message UserRequest {
     string username = 1;
+    optional string id = 2;
 }
 
 message UserResponse {
@@ -154,6 +156,18 @@ message Like {
 message Likes {
     uint64 count = 1;
     repeated Like likes = 2;
+}
+
+message PhotoRequest {
+    string user_id = 1;
+    string country_code = 2;
+    string description = 3;
+    bytes src = 4;
+    optional Like like = 5;
+}
+
+message PhotoResponse {
+    string id = 1;
 }
 
 message Photo {

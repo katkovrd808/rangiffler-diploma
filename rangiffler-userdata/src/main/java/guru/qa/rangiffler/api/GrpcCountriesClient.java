@@ -1,4 +1,4 @@
-package guru.qa.rangiffler.service.api;
+package guru.qa.rangiffler.api;
 
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
 import guru.qa.rangiffler.service.mapper.CountryMapper;

@@ -12,7 +12,8 @@ service RangifflerUserdataService {
     rpc GetUser(UserRequest) returns (UserResponse);
     rpc AllUsers(UsersPaginatedRequest) returns (UsersPaginatedResponse);
     rpc UpdateUser(UserUpdateRequest) returns (UserUpdateResponse);
-    rpc AllFriends(AllFriendsPaginatedRequest) returns (AllFriendsPaginatedResponse);
+    rpc AllFriendsPaginated(AllFriendsPaginatedRequest) returns (AllFriendsPaginatedResponse);
+    rpc AllFriends(AllFriendsRequest) returns (AllFriendsResponse);
     rpc GetIncomeInvitations(InvitationsPaginatedRequest) returns (InvitationsPaginatedResponse);
     rpc GetOutcomeInvitations(InvitationsPaginatedRequest) returns (InvitationsPaginatedResponse);
     rpc CreateFriendshipRequest(FriendshipRequest) returns (FriendshipResponse);
@@ -24,6 +25,7 @@ service RangifflerUserdataService {
 service RangifflerCountriesService {
     rpc GetCountry(CountryRequest) returns (CountryResponse);
     rpc AllCountries(google.protobuf.Empty) returns (CountriesResponse);
+    rpc GetCountriesByIds(NeededCountriesRequest) returns (NeededCountriesResponse);
 }
 
 service RangifflerPhotosService {
@@ -32,6 +34,8 @@ service RangifflerPhotosService {
     rpc DeletePhoto(PhotoDeleteRequest) returns (google.protobuf.Empty);
     rpc AddPhotoLike(PhotoLikeRequest) returns (PhotoResponse);
     rpc DeletePhotoLike(PhotoLikeRequest) returns (google.protobuf.Empty);
+    rpc GetPhotoWithLikes(PhotoWithLikesRequest) returns (PhotoResponse);
+    rpc GetUserFeed(FeedRequest) returns (FeedResponse);
 }
 
 message PaginationRequest {
@@ -125,6 +129,14 @@ message AllFriendsPaginatedResponse {
     PaginationResponse pagination_response = 2;
 }
 
+message AllFriendsRequest {
+    string target_username = 1;
+}
+
+message AllFriendsResponse {
+    repeated Friend friends = 1;
+}
+
 message InvitationsPaginatedRequest {
     string target_username = 1;
     optional string search_query = 2;
@@ -148,10 +160,23 @@ message CountryResponse {
     bytes flag = 4;
 }
 
+message NeededCountriesRequest {
+    repeated string id = 1;
+}
+
+message NeededCountriesResponse {
+    repeated CountryResponse countries = 1;
+}
+
 message CountryPhoto {
     string name = 1;
     string code = 2;
     bytes flag = 3;
+}
+
+message CountryStatistic {
+    uint32 count = 1;
+    string code = 2;
 }
 
 message CountriesResponse {
@@ -170,6 +195,20 @@ message PhotoRequest {
     optional Like like = 5;
 }
 
+message PhotoResponse {
+    string id = 1;
+    string user_id = 2;
+    string description = 4;
+    bytes src = 5;
+    CountryPhoto country = 3;
+    repeated Like likes = 6;
+    PaginationResponse pagination_response = 7;
+}
+
+message PhotoWithLikesRequest {
+    string id = 1;
+}
+
 message PhotoDeleteRequest {
     string id = 1;
     string user_id = 2;
@@ -183,18 +222,24 @@ message PhotoUpdateRequest {
     CountryPhoto country = 3;
 }
 
-message PhotoResponse {
-    string id = 1;
-    string user_id = 2;
-    string description = 4;
-    bytes src = 5;
-    CountryPhoto country = 3;
-    repeated Like likes = 6;
-}
-
 message PhotoLikeRequest {
     string photo_id = 1;
     Like like = 2;
+}
+
+message UserCountryStatistic {
+    repeated CountryStatistic country = 2;
+}
+
+message FeedRequest {
+    string user_id = 1;
+    bool with_friends = 2;
+    PaginationRequest pagination_request = 3;
+}
+
+message FeedResponse {
+    repeated PhotoResponse photos = 1;
+    UserCountryStatistic statistic = 2;
 }
 
 enum FriendStatus {

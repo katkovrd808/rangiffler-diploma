@@ -1,6 +1,7 @@
-package guru.qa.rangiffler.service;
+package guru.qa.rangiffler.grpc;
 
-import guru.qa.rangiffler.ex.*;
+import guru.qa.rangiffler.ex.CountryNotFoundException;
+import guru.qa.rangiffler.ex.IsoCodeMismatchException;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
@@ -18,14 +19,11 @@ public class GlobalGrpcExceptionHandler implements GrpcExceptionHandler {
   @Override
   public Status handleException(Throwable exception) {
     Status status = switch (exception) {
-      case UserNotFoundException e -> NOT_FOUND;
-      case SameUsernameException e -> INVALID_ARGUMENT;
-      case UnsupportedOperationException e -> Status.UNIMPLEMENTED;
-      case NotFoundException e -> NOT_FOUND;
-      case StatusRuntimeException e -> Status.UNAVAILABLE;
-      case InvalidFriendshipOperationException e -> INVALID_ARGUMENT;
-      case FriendshipNotFoundException e -> NOT_FOUND;
+      case CountryNotFoundException e -> NOT_FOUND;
+      case IsoCodeMismatchException e -> INVALID_ARGUMENT;
       case IllegalArgumentException e -> INVALID_ARGUMENT;
+      case UnsupportedOperationException e -> Status.UNIMPLEMENTED;
+      case StatusRuntimeException e -> Status.UNAVAILABLE;
       default -> INTERNAL;
     };
 

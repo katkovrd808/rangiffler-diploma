@@ -1,10 +1,10 @@
-package guru.qa.rangiffler.service;
+package guru.qa.rangiffler.grpc;
 
 import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.repository.UserRepository;
-import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.UserJson;
 import guru.qa.rangiffler.api.GrpcCountriesClient;
+import guru.qa.rangiffler.service.UserService;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Nonnull;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -87,11 +87,18 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
   }
 
   @Override
-  public void allFriends(AllFriendsPaginatedRequest request, StreamObserver<AllFriendsPaginatedResponse> responseObserver) {
+  public void allFriendsPaginated(AllFriendsPaginatedRequest request, StreamObserver<AllFriendsPaginatedResponse> responseObserver) {
     AllFriendsPaginatedResponse response = userService.allFriends(
       createPageable(request.getPaginationRequest()),
       request.getTargetUsername(),
       request.getSearchQuery());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void allFriends(AllFriendsRequest request, StreamObserver<AllFriendsResponse> responseObserver) {
+    AllFriendsResponse response = userService.allFriends(request.getTargetUsername());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

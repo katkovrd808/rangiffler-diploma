@@ -12,6 +12,8 @@ spring:
       security:
         csrf:
           enabled: false
+      max-inbound-message-size: 1048576
+      max-inbound-metadata-size: 32768
     client:
       channels:
         countries-service:
@@ -28,6 +30,7 @@ spring:
       org.springframework.security.oauth2: INFO
       net.devh.boot.grpc: INFO
       org.springframework.boot.autoconfigure: INFO
+      io.grpc: DEBUG
   datasource:
     url: 'jdbc:postgresql://127.0.0.1:5432/rangiffler-photos'
     username: postgres

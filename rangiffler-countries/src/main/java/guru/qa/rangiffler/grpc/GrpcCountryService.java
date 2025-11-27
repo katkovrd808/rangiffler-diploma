@@ -1,15 +1,13 @@
-package guru.qa.rangiffler.service;
+package guru.qa.rangiffler.grpc;
 
 import com.google.protobuf.Empty;
-import guru.qa.rangiffler.grpc.CountriesResponse;
-import guru.qa.rangiffler.grpc.CountryRequest;
-import guru.qa.rangiffler.grpc.CountryResponse;
-import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
+import guru.qa.rangiffler.service.CountryService;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.grpc.server.service.GrpcService;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.UUID;
 
 @GrpcService
 @ParametersAreNonnullByDefault
@@ -32,6 +30,16 @@ public class GrpcCountryService extends RangifflerCountriesServiceGrpc.Rangiffle
   @Override
   public void allCountries(Empty request, StreamObserver<CountriesResponse> responseObserver) {
     CountriesResponse response = countryService.allCountries();
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getCountriesByIds(NeededCountriesRequest request, StreamObserver<NeededCountriesResponse> responseObserver) {
+    NeededCountriesResponse response = countryService.findNeededCountries(request.getIdList().stream()
+      .map(UUID::fromString)
+      .toList()
+    );
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

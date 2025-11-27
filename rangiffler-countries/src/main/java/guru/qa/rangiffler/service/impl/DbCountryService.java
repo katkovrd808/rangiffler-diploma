@@ -2,10 +2,11 @@ package guru.qa.rangiffler.service.impl;
 
 import guru.qa.rangiffler.data.CountryEntity;
 import guru.qa.rangiffler.data.repository.CountryRepository;
+import guru.qa.rangiffler.ex.CountryNotFoundException;
 import guru.qa.rangiffler.ex.IsoCodeMismatchException;
 import guru.qa.rangiffler.grpc.CountriesResponse;
 import guru.qa.rangiffler.grpc.CountryResponse;
-import guru.qa.rangiffler.ex.CountryNotFoundException;
+import guru.qa.rangiffler.grpc.NeededCountriesResponse;
 import guru.qa.rangiffler.service.CountryService;
 import guru.qa.rangiffler.service.mapper.CountryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +58,12 @@ public class DbCountryService implements CountryService {
   public @Nonnull CountriesResponse allCountries() {
     List<CountryEntity> countries = countryRepository.findAll();
     return countryMapper.toProtoList(countries);
+  }
+
+  @Nonnull
+  @Override
+  public NeededCountriesResponse findNeededCountries(List<UUID> neededCountriesIds) {
+    List<CountryEntity> countries = countryRepository.findNeededCountries(neededCountriesIds);
+    return countryMapper.toNeededCountriesProto(countries);
   }
 }

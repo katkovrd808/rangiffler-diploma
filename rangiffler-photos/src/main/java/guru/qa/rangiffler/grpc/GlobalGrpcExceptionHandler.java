@@ -1,5 +1,8 @@
-package guru.qa.rangiffler.service;
+package guru.qa.rangiffler.grpc;
 
+import guru.qa.rangiffler.ex.InvalidPhotoLikeOperationException;
+import guru.qa.rangiffler.ex.PhotoLikeNotFoundException;
+import guru.qa.rangiffler.ex.PhotoNotFoundException;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
@@ -17,6 +20,9 @@ public class GlobalGrpcExceptionHandler implements GrpcExceptionHandler {
   @Override
   public Status handleException(Throwable exception) {
     Status status = switch (exception) {
+      case PhotoLikeNotFoundException e -> INVALID_ARGUMENT;
+      case PhotoNotFoundException e -> NOT_FOUND;
+      case InvalidPhotoLikeOperationException e -> PERMISSION_DENIED;
       case IllegalArgumentException e -> INVALID_ARGUMENT;
       case UnsupportedOperationException e -> Status.UNIMPLEMENTED;
       case StatusRuntimeException e -> Status.UNAVAILABLE;
@@ -33,7 +39,7 @@ public class GlobalGrpcExceptionHandler implements GrpcExceptionHandler {
 
     switch (statusCode) {
       case INTERNAL -> LOG.error("Internal error: {}", exception.getMessage(), exception);
-      case NOT_FOUND, INVALID_ARGUMENT, UNIMPLEMENTED, UNAVAILABLE ->
+      case NOT_FOUND, PERMISSION_DENIED, INVALID_ARGUMENT, UNIMPLEMENTED, UNAVAILABLE ->
         LOG.warn("Business exception [{}]: {}", statusCode, exception.getMessage());
       default -> LOG.info("Handled exception [{}]: {}", statusCode, exception.getMessage());
     }

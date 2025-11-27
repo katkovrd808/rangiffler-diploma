@@ -6,7 +6,10 @@ import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.data.repository.FriendshipRepository;
 import guru.qa.rangiffler.data.repository.UserRepository;
-import guru.qa.rangiffler.ex.*;
+import guru.qa.rangiffler.ex.FriendshipNotFoundException;
+import guru.qa.rangiffler.ex.InvalidFriendshipOperationException;
+import guru.qa.rangiffler.ex.SameUsernameException;
+import guru.qa.rangiffler.ex.UserNotFoundException;
 import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.service.UserService;
 import guru.qa.rangiffler.service.mapper.UserMapper;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,6 +101,17 @@ public class DbUserService implements UserService {
     return userMapper.toProtoFriendsListResponse(users);
   }
 
+  @Nonnull
+  @Override
+  public AllFriendsResponse allFriends(String username) {
+    if (username.isEmpty()) {
+      throw new IllegalArgumentException("User can't be empty.");
+    }
+    UserEntity ue = getRequiredUser(username);
+    List<UserWithStatus> users = friendshipRepository.findFriends(ue);
+    return userMapper.toProtoFriendsListResponse(users);
+  }
+
   @Override
   @Transactional(readOnly = true)
   public @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable,
@@ -127,7 +142,6 @@ public class DbUserService implements UserService {
     return userMapper.toProtoInvitationsList(users);
   }
 
-  //TODO обрабатывать статус друга при создании дружбы: INVITATION_SEND
   @Override
   @Transactional
   public @Nonnull FriendshipResponse sendFriendshipRequest(String username, String targetUsername) {

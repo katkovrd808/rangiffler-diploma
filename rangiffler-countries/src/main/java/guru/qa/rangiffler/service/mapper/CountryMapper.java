@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import guru.qa.rangiffler.data.CountryEntity;
 import guru.qa.rangiffler.grpc.CountriesResponse;
 import guru.qa.rangiffler.grpc.CountryResponse;
+import guru.qa.rangiffler.grpc.NeededCountriesResponse;
 import org.mapstruct.Mapper;
 
 import javax.annotation.Nonnull;
@@ -30,7 +31,17 @@ public interface CountryMapper {
       CountriesResponse.getDefaultInstance() :
       CountriesResponse.newBuilder()
         .addAllCountries(countries.stream()
-          .map(this::toProto).collect(Collectors.toList()))
+          .map(this::toProto)
+          .collect(Collectors.toList()))
+        .build();
+  }
+
+  default NeededCountriesResponse toNeededCountriesProto(List<CountryEntity> countries) {
+    return countries.isEmpty() ? NeededCountriesResponse.getDefaultInstance() :
+      NeededCountriesResponse.newBuilder()
+        .addAllCountries(countries.stream()
+          .map(this::toProto)
+          .collect(Collectors.toList()))
         .build();
   }
 

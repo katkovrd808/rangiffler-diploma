@@ -5,6 +5,7 @@ import guru.qa.rangiffler.api.GrpcCountriesClient;
 import guru.qa.rangiffler.api.GrpcUserdataClient;
 import guru.qa.rangiffler.data.PhotoEntity;
 import guru.qa.rangiffler.data.PhotoLikeEntity;
+import guru.qa.rangiffler.data.projection.PhotoWithLikes;
 import guru.qa.rangiffler.data.repository.PhotoLikeRepository;
 import guru.qa.rangiffler.data.repository.PhotoRepository;
 import guru.qa.rangiffler.ex.InvalidPhotoLikeOperationException;
@@ -12,6 +13,7 @@ import guru.qa.rangiffler.ex.PhotoLikeNotFoundException;
 import guru.qa.rangiffler.ex.PhotoNotFoundException;
 import guru.qa.rangiffler.grpc.PhotoLikeRequest;
 import guru.qa.rangiffler.grpc.PhotoResponse;
+import guru.qa.rangiffler.grpc.PhotoWithLikesRequest;
 import guru.qa.rangiffler.model.CountryDto;
 import guru.qa.rangiffler.service.PhotoLikeService;
 import guru.qa.rangiffler.service.mapper.PhotoMapper;
@@ -19,9 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +57,7 @@ public class DbPhotoLikeService implements PhotoLikeService {
   }
 
   @Override
+  @Transactional
   public @Nonnull PhotoResponse likePhoto(PhotoLikeRequest request) {
     final String userId = request.getLike().getUserId();
     final String photoId = request.getPhotoId();
@@ -64,26 +69,27 @@ public class DbPhotoLikeService implements PhotoLikeService {
 
     assertUserCreated(userId);
 
-    final PhotoEntity photo = getPhotoEntity(photoId);
+    final PhotoEntity photo = getRequiredPhoto(photoId);
     final CountryDto country = getCountryDto(photo.getCountryId().toString());
 
-    Optional<PhotoLikeEntity> existing = checkExistingLike(photoId, userId);
+    final Optional<PhotoLikeEntity> existing = checkExistingLike(photoId, userId);
 
     if (existing.isPresent()) {
       photoLikeRepository.save(existing.get());
-      return photoMapper.toProto(photo, country);
+      return photoMapper.toProto(PhotoWithLikes.fromEntity(photo), country);
     }
 
     PhotoLikeEntity ple = new PhotoLikeEntity();
-    ple.setPhotoId(UUID.fromString(photoId));
+    ple.setPhoto(photo);
     ple.setUserId(UUID.fromString(userId));
 
     photoLikeRepository.save(ple);
 
-    return photoMapper.toProto(photo, country);
+    return photoMapper.toProto(PhotoWithLikes.fromEntity(photo), country);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public @Nonnull Empty deleteLike(PhotoLikeRequest request) {
     final String userId = request.getLike().getUserId();
     final String photoId = request.getPhotoId();
@@ -108,6 +114,14 @@ public class DbPhotoLikeService implements PhotoLikeService {
     return Empty.getDefaultInstance();
   }
 
+  @Nonnull
+  @Override
+  @Transactional
+  public List<PhotoLikeEntity> getPhotoWithLikes(PhotoWithLikesRequest request) {
+    PhotoEntity pe = getRequiredPhoto(request.getId());
+    return photoLikeRepository.findPhotoLikesByPhotoId(pe.getId());
+  }
+
   private @Nonnull CountryDto getCountryDto(String countryId) {
     return grpcCountriesClient.getCountryById(countryId)
       .map(c -> {
@@ -115,17 +129,20 @@ public class DbPhotoLikeService implements PhotoLikeService {
           c.id(),
           c.name(),
           c.code(),
-          c.flag()
+          c.flag(),
+          0
         );
       })
       .orElseThrow();
   }
 
-  private @Nonnull PhotoEntity getPhotoEntity(String photoId) {
+  @Transactional(readOnly = true)
+  private @Nonnull PhotoEntity getRequiredPhoto(String photoId) {
     return photoRepository.findById(UUID.fromString(photoId))
       .orElseThrow(() -> new PhotoNotFoundException("Can't find photo with id: " + photoId));
   }
 
+  @Transactional(readOnly = true)
   private Optional<PhotoLikeEntity> checkExistingLike(String photoId, String userId) {
     return photoLikeRepository.findByPhotoIdAndUserId(UUID.fromString(photoId), UUID.fromString(userId));
   }

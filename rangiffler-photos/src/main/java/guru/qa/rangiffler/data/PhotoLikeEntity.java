@@ -21,8 +21,9 @@ public class PhotoLikeEntity {
   @Column(name = "user_id")
   private UUID userId;
 
-  @Column(name = "photo_id")
-  private UUID photoId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "photo_id")
+  private PhotoEntity photo;
 
   @Column(name = "created_date", columnDefinition = "DATE", insertable = false)
   private Date createdDate;

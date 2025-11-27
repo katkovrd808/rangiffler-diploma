@@ -11,10 +11,27 @@ import org.springframework.data.repository.query.Param;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public interface FriendshipRepository extends JpaRepository<FriendshipEntity, UUID> {
+  @Query(
+    value = """
+        SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(
+            u.id, u.username, u.firstname, u.surname, u.photo, u.countryId, f.status,
+                  CASE WHEN f.requester = :user THEN true ELSE false END)
+        FROM UserEntity u
+        JOIN FriendshipEntity f
+        ON (u = f.requester AND f.addressee = :user)
+           OR (u = f.addressee AND f.requester = :user)
+        WHERE f.status = guru.qa.rangiffler.data.FriendshipStatus.ACCEPTED
+        ORDER BY u.username ASC
+      """
+  )
+  @Nonnull
+  List<UserWithStatus> findFriends(@Param("user") UserEntity user);
+
   @Query(
     value = """
         SELECT DISTINCT NEW guru.qa.rangiffler.data.projection.UserWithStatus(

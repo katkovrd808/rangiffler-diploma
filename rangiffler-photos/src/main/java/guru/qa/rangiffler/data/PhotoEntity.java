@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -32,6 +31,22 @@ public class PhotoEntity {
 
   @Column(name = "created_date", columnDefinition = "DATE", insertable = false)
   private Date createdDate;
+
+  @OneToMany(mappedBy = "photo", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<PhotoLikeEntity> photoLikes = new ArrayList<>();
+
+  public void addLikes(PhotoLikeEntity... photos) {
+    List<PhotoLikeEntity> photoLikesEntities = Stream.of(photos)
+      .map(p -> {
+        PhotoLikeEntity pe = new PhotoLikeEntity();
+        pe.setId(p.getId());
+        pe.setPhoto(p.getPhoto());
+        pe.setUserId(p.getUserId());
+        pe.setCreatedDate(p.getCreatedDate());
+        return pe;
+      }).toList();
+    this.photoLikes.addAll(photoLikesEntities);
+  }
 
   @Override
   public final boolean equals(Object o) {

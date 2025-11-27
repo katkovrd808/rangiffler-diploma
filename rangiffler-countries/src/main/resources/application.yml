@@ -12,6 +12,7 @@ spring:
       security:
         csrf:
           enabled: false
+      max-inbound-message-size: 10485760
   logging:
     file:
       path: ./logs/rangiffler-countries

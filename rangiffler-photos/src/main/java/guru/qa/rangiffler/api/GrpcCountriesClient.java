@@ -1,6 +1,8 @@
 package guru.qa.rangiffler.api;
 
+import com.google.protobuf.Empty;
 import guru.qa.rangiffler.grpc.CountryRequest;
+import guru.qa.rangiffler.grpc.NeededCountriesRequest;
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
 import guru.qa.rangiffler.model.CountryDto;
 import guru.qa.rangiffler.service.mapper.CountryMapper;
@@ -15,7 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @ParametersAreNonnullByDefault
@@ -30,6 +35,13 @@ public class GrpcCountriesClient {
                              CountryMapper countryMapper) {
     this.rangifflerCountriesServiceBlockingStub = rangifflerCountriesServiceBlockingStub;
     this.countryMapper = countryMapper;
+  }
+
+  @Nonnull
+  public List<CountryDto> getAllCountries() {
+    return countryMapper.toDtoList(
+      rangifflerCountriesServiceBlockingStub.allCountries(Empty.getDefaultInstance())
+    );
   }
 
   @Nonnull
@@ -58,6 +70,32 @@ public class GrpcCountriesClient {
       Status.Code code = e.getStatus().getCode();
       if (code == Status.Code.NOT_FOUND || code == Status.Code.INVALID_ARGUMENT) {
         return Optional.empty();
+      } else {
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled or Userdata service unavailable", e);
+      }
+    }
+  }
+
+  @Nonnull
+  public List<CountryDto> getCountriesByIds(List<UUID> neededCountries) {
+    try {
+      NeededCountriesRequest request = countryMapper.toNeededRequest(neededCountries);
+      return rangifflerCountriesServiceBlockingStub.getCountriesByIds(request).getCountriesList().stream()
+        .map(c -> {
+          return new CountryDto(
+            UUID.fromString(c.getId()),
+            c.getName(),
+            c.getCode(),
+            c.getFlag().toByteArray(),
+            0
+          );
+        })
+        .toList();
+    } catch (StatusRuntimeException e) {
+      LOG.error("### Error while calling gRPC server ", e);
+      Status.Code code = e.getStatus().getCode();
+      if (code == Status.Code.NOT_FOUND || code == Status.Code.INVALID_ARGUMENT) {
+        return Collections.emptyList();
       } else {
         throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled or Userdata service unavailable", e);
       }

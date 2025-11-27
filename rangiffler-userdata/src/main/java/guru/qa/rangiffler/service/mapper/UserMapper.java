@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -76,6 +77,15 @@ public interface UserMapper {
             .map(this::toProtoFriend)
             .collect(Collectors.toList()))
         .setPaginationResponse(createPaginationResponse(friends))
+        .build();
+  }
+
+  default @Nonnull AllFriendsResponse toProtoFriendsListResponse(List<UserWithStatus> friends) {
+    return friends.isEmpty() ? AllFriendsResponse.getDefaultInstance() :
+      AllFriendsResponse.newBuilder().addAllFriends(
+          friends.stream()
+            .map(this::toProtoFriend)
+            .collect(Collectors.toList()))
         .build();
   }
 

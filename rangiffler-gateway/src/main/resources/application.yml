@@ -5,6 +5,16 @@ spring:
   application:
     name: rangiffler-gateway
 
+  grpc:
+    client:
+      channels:
+        countries-service:
+          address: 127.0.0.1:9090
+        userdata-service:
+          address: 127.0.0.1:9091
+        countries-photos:
+          address: 127.0.0.1:9093
+
   logging:
     file:
       path: ./logs/rangiffler-gateway
@@ -16,20 +26,12 @@ spring:
       net.devh.boot.grpc: INFO
       org.springframework.boot.autoconfigure: INFO
 
-  autoconfigure:
-    exclude:
-      - 'org.springframework.cloud.vault.config.VaultAutoConfiguration'
-      - 'org.springframework.cloud.vault.config.VaultObservationAutoConfiguration'
-      - 'org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration'
-
   graphql:
     graphiql:
       enabled: true
-
     schema:
       introspection:
         enabled: true
-
   security:
     oauth2:
       resourceserver:
@@ -42,3 +44,7 @@ rangiffler-gateway:
   base-uri: 'http://127.0.0.1:8080'
 rangiffler-userdata:
   base-uri: 'http://127.0.0.1:8081'
+rangiffler-countries:
+  base-uri: 'http://127.0.0.1:8082'
+rangiffler-photos:
+  base-uri: 'http://127.0.0.1:8083'

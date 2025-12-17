@@ -19,6 +19,8 @@ public interface UserService {
 
   @Nonnull AllFriendsPaginatedResponse allFriends(Pageable pageable, String username, @Nullable String searchQuery);
 
+  @Nonnull AllFriendsResponse allFriends(String username);
+
   @Nonnull InvitationsPaginatedResponse incomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull InvitationsPaginatedResponse outcomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);

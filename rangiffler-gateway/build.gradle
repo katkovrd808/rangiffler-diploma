@@ -8,6 +8,7 @@ version = '2.3.0'
 dependencies {
     implementation project(':rangiffler-grpc-common')
 
+    //WEB
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -18,8 +19,10 @@ dependencies {
     implementation 'org.springframework.data:spring-data-commons'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    //graphQL
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
     implementation "com.tailrocks.graphql:graphql-datetime-spring-boot-starter:${project.ext.springGraphqlDateTimeVersion}"
+    //gRPC
     implementation("net.devh:grpc-client-spring-boot-starter:${project.ext.springGrpcVersion}") {
         exclude group: 'io.grpc'
         exclude group: 'com.google.protobuf'
@@ -28,10 +31,10 @@ dependencies {
     implementation "io.grpc:grpc-netty-shaded:${project.ext.grpcVersion}"
     implementation "io.grpc:grpc-services:${project.ext.grpcVersion}"
     implementation "io.grpc:grpc-inprocess:${project.ext.grpcVersion}"
-
+    //UTILS
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
+    //TEST
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation "org.springframework.security:spring-security-test:${project.ext.springSecurityTestVersion}"
 }

@@ -1,6 +1,6 @@
 package guru.qa.rangiffler.service;
 
-import guru.qa.rangiffler.domain.UserGql;
+import guru.qa.rangiffler.model.graphql.UserGql;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 

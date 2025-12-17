@@ -70,7 +70,7 @@ logging:
     org.apache.catalina.filters.RequestDumperFilter: INFO
     org.springframework.boot.autoconfigure: INFO
     org.apache.coyote.http11.Http11Processor: INFO
-    org.springframework.web.servlet.resource: INFO
+    org.springframework.web.servlet.resource: WARN
 
 oauth2:
   web-client-id: 'client'

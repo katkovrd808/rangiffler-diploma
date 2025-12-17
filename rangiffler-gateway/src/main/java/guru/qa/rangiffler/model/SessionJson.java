@@ -1,4 +1,4 @@
-package guru.qa.rangiffler.domain;
+package guru.qa.rangiffler.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;

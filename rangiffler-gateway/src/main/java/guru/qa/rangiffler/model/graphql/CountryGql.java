@@ -1,4 +1,4 @@
-package guru.qa.rangiffler.domain;
+package guru.qa.rangiffler.model.graphql;
 
 import java.util.UUID;
 

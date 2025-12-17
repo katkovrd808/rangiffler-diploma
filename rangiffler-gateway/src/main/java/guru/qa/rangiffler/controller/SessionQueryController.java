@@ -1,7 +1,7 @@
 package guru.qa.rangiffler.controller;
 
 
-import guru.qa.rangiffler.domain.SessionJson;
+import guru.qa.rangiffler.model.SessionJson;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;

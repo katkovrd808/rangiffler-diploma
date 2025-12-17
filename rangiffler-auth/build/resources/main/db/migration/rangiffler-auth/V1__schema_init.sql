@@ -9,7 +9,7 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS "user"
 (
-    id                      uuid PRIMARY KEY DEFAULT uuid_generate_v1(),
+    id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     username                varchar(50) UNIQUE NOT NULL,
     password                varchar(255)       NOT NULL,
     enabled                 boolean            NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS "user"
 
 CREATE TABLE IF NOT EXISTS "authority"
 (
-    id        uuid PRIMARY KEY DEFAULT uuid_generate_v1(),
+    id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id   uuid NOT NULL REFERENCES "user" (id),
     authority authority_enum NOT NULL
 );

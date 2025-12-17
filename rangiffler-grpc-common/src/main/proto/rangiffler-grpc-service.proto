@@ -80,7 +80,7 @@ message UserResponse {
     string firstname = 3;
     string surname = 4;
     bytes photo = 5;
-    FriendStatus friendship_status = 6;
+    FriendStatus friend_status = 6;
     repeated UserResponse friends = 7;
     repeated UserResponse income_invitations = 8;
     repeated UserResponse outcome_invitations = 9;

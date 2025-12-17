@@ -1,6 +1,8 @@
 package guru.qa.rangiffler.api;
 
+import guru.qa.rangiffler.grpc.CountryRequest;
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
+import guru.qa.rangiffler.model.CountryDto;
 import guru.qa.rangiffler.service.mapper.CountryMapper;
 import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Nonnull;
@@ -32,7 +34,17 @@ public class GrpcCountriesClient {
   @Nonnull
   public UUID getCountryId(String isoCode) {
     try {
-      return UUID.fromString(rangifflerCountriesServiceBlockingStub.getCountry(countryMapper.toProto(isoCode)).getId());
+      return UUID.fromString(rangifflerCountriesServiceBlockingStub.getCountry(countryMapper.toProtoRequest(isoCode, null)).getId());
+    } catch (StatusRuntimeException e) {
+      LOG.error("### Error while calling gRPC server ", e);
+      throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled", e);
+    }
+  }
+
+  public CountryDto getCountryById(UUID id) {
+    try {
+      CountryRequest request = countryMapper.toProtoRequest(null, id.toString());
+      return countryMapper.toDto(rangifflerCountriesServiceBlockingStub.getCountry(request));
     } catch (StatusRuntimeException e) {
       LOG.error("### Error while calling gRPC server ", e);
       throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "The gRPC operation was cancelled", e);

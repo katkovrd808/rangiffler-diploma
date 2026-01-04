@@ -30,7 +30,6 @@ spring:
       org.springframework.web: INFO
       org.springframework.security: INFO
       org.springframework.security.oauth2: INFO
-      net.devh.boot.grpc: INFO
       org.springframework.boot.autoconfigure: INFO
   datasource:
     url: 'jdbc:postgresql://127.0.0.1:5432/rangiffler-userdata'

@@ -1,6 +1,5 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
-    id 'com.google.protobuf' version '0.9.5'
 }
 
 group = 'guru.qa'
@@ -9,6 +8,8 @@ version = 'unspecified'
 dependencies {
     implementation project(':rangiffler-grpc-common')
 
+    //gRPC
+    implementation 'org.springframework.grpc:spring-grpc-server-spring-boot-starter'
     //WEB
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation('org.springframework.boot:spring-boot-starter-web-services') {
@@ -21,11 +22,11 @@ dependencies {
     runtimeOnly "org.postgresql:postgresql:${project.ext.postgresDriverVersion}"
     testImplementation "com.h2database:h2:${project.ext.h2Version}"
     //UTIL
-    implementation "wsdl4j:wsdl4j:${project.ext.wsdl4jVersion}"
     implementation "net.coobird:thumbnailator:${project.ext.thumbnailatorVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
-    annotationProcessor "org.projectlombok:lombok:1.18.38"
-    compileOnly "org.projectlombok:lombok:1.18.38"
+    implementation "org.mapstruct:mapstruct:${project.ext.mapStructVersion}"
+    annotationProcessor "org.projectlombok:lombok:${project.ext.lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${project.ext.lombokVersion}"
     //TEST
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

@@ -4,18 +4,12 @@ plugins {
 }
 
 group = 'guru.qa'
-version = 'unspecified'
+version = '1.0.0'
 
 dependencies {
-    //GRPC
-    api 'org.springframework.grpc:spring-grpc-spring-boot-starter'
     api "com.google.protobuf:protobuf-java-util:${dependencyManagement.importedProperties['protobuf-java.version']}"
     api 'io.grpc:grpc-services'
-    //UTIL
-    api "org.mapstruct:mapstruct:${project.ext.mapStructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
-    annotationProcessor "org.projectlombok:lombok:1.18.38"
-    compileOnly "org.projectlombok:lombok:1.18.38"
+    api 'io.grpc:grpc-protobuf'
 }
 
 protobuf {

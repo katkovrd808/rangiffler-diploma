@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: rangiffler-gateway
-
   grpc:
     client:
       channels:
@@ -14,7 +13,6 @@ spring:
           address: 127.0.0.1:9091
         countries-photos:
           address: 127.0.0.1:9093
-
   logging:
     file:
       path: ./logs/rangiffler-gateway
@@ -23,9 +21,7 @@ spring:
       org.springframework.web: INFO
       org.springframework.security: INFO
       org.springframework.security.oauth2: INFO
-      net.devh.boot.grpc: INFO
       org.springframework.boot.autoconfigure: INFO
-
   graphql:
     graphiql:
       enabled: true
@@ -37,7 +33,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: 'http://127.0.0.1:9000'
-
+rangiffler-auth:
+  base-uri: 'http://127.0.0.1:9000'
 rangiffler-front:
   base-uri: 'http://127.0.0.1:3001'
 rangiffler-gateway:

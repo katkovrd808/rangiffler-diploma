@@ -46,7 +46,7 @@ public interface CountryMapper {
   }
 
   @Nonnull
-  default ByteString map(byte[] value) {
+  private ByteString map(byte[] value) {
     return ByteString.copyFrom(value);
   }
 }

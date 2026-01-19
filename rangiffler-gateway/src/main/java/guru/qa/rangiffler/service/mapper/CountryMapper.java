@@ -3,16 +3,15 @@ package guru.qa.rangiffler.service.mapper;
 import guru.qa.rangiffler.grpc.CountriesResponse;
 import guru.qa.rangiffler.grpc.CountryRequest;
 import guru.qa.rangiffler.grpc.CountryResponse;
-import guru.qa.rangiffler.grpc.NeededCountriesRequest;
-import guru.qa.rangiffler.model.dto.CountryDto;
+import guru.qa.rangiffler.model.graphql.countries.CountryGql;
 import org.mapstruct.Mapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -40,38 +39,30 @@ public interface CountryMapper {
   }
 
   @Nonnull
-  default NeededCountriesRequest toNeededRequest(List<UUID> neededCountries) {
-    return neededCountries.isEmpty() ? NeededCountriesRequest.getDefaultInstance() :
-      NeededCountriesRequest.newBuilder()
-        .addAllId(neededCountries.stream()
-          .map(UUID::toString)
-          .toList()
-        )
-        .build();
+  default CountryGql toCountryGql(CountryResponse response) {
+    String photo = Base64.getEncoder().encodeToString(response.getFlag().toByteArray());
+    final boolean photoString = isPhotoString(photo);
+    if (response.isInitialized()) {
+      return new CountryGql(
+        UUID.fromString(response.getId()),
+        response.getName(),
+        response.getCode(),
+        photoString ? photo : "data:image/png;base64," + photo
+      );
+    } else return CountryGql.empty();
   }
 
   @Nonnull
-  default Optional<CountryDto> toDto(CountryResponse response) {
-    return Optional.of(new CountryDto(
-      response.getName(),
-      response.getCode(),
-      response.getFlag().toByteArray()
-    ));
-  }
-
-  @Nonnull
-  default List<CountryDto> toDtoList(CountriesResponse response) {
+  default List<CountryGql> toCountriesGqlList(CountriesResponse response) {
     if (response.getCountriesList().isEmpty()) {
       return new ArrayList<>();
     }
     return response.getCountriesList().stream()
-      .map(c -> {
-        return new CountryDto(
-          c.getName(),
-          c.getCode(),
-          c.getFlag().toByteArray()
-        );
-      })
+      .map(this::toCountryGql)
       .toList();
+  }
+
+  private boolean isPhotoString(String photo) {
+    return photo != null && photo.startsWith("data:image");
   }
 }

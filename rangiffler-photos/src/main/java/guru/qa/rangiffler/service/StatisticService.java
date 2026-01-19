@@ -10,4 +10,6 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public interface StatisticService {
   @Nonnull List<StatisticEntity> getUserCountriesStatistic(FeedRequest request);
+
+  @Nonnull List<StatisticEntity> getUserCountriesStatisticWithFriends(FeedRequest request);
 }

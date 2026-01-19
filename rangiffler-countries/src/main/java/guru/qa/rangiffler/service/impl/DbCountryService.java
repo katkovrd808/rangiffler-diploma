@@ -42,10 +42,9 @@ public class DbCountryService implements CountryService {
       .orElseThrow(() -> new CountryNotFoundException("Can't find country with iso code: " + isoCode));
   }
 
-  @Nonnull
   @Override
-  public CountryResponse findById(String id) {
-    if (id == null) {
+  public @Nonnull CountryResponse findById(String id) {
+    if (id == null || id.isEmpty()) {
       throw new IllegalArgumentException("Id can't be null value.");
     }
     return countryRepository.findById(UUID.fromString(id))
@@ -56,13 +55,13 @@ public class DbCountryService implements CountryService {
   @Override
   @Transactional(readOnly = true)
   public @Nonnull CountriesResponse allCountries() {
-    List<CountryEntity> countries = countryRepository.findAll();
+    List<CountryEntity> countries = countryRepository.findAllByOrderByNameAsc();
     return countryMapper.toProtoList(countries);
   }
 
-  @Nonnull
   @Override
-  public NeededCountriesResponse findNeededCountries(List<UUID> neededCountriesIds) {
+  @Transactional(readOnly = true)
+  public @Nonnull NeededCountriesResponse findNeededCountries(List<UUID> neededCountriesIds) {
     List<CountryEntity> countries = countryRepository.findNeededCountries(neededCountriesIds);
     return countryMapper.toNeededCountriesProto(countries);
   }

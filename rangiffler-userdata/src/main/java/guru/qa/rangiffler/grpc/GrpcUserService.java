@@ -74,7 +74,16 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
 
   @Override
   public void getUser(UserRequest request, StreamObserver<UserResponse> responseObserver) {
-    UserResponse response = request.hasId() ? userService.findById(request.getId()) : userService.getCurrentUser(request.getUsername());
+    UserResponse response = request.hasId()
+      ? userService.findById(request.getId())
+      : userService.findByUsername(request.getUsername());
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getUserWithFriendStatus(UserWithStatusRequest request, StreamObserver<UserResponse> responseObserver) {
+    UserResponse response = userService.findUserWithFriendStatus(request.getTargetUserId(), request.getCurrentUserId());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

@@ -53,8 +53,8 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   }
 
   @Override
-  public void deletePhoto(PhotoDeleteRequest request, StreamObserver<Empty> responseObserver) {
-    Empty response = photoService.deletePhoto(request);
+  public void deletePhoto(PhotoDeleteRequest request, StreamObserver<PhotoDeleteResponse> responseObserver) {
+    PhotoDeleteResponse response = photoService.deletePhoto(request);
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
@@ -67,8 +67,8 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   }
 
   @Override
-  public void deletePhotoLike(PhotoLikeRequest request, StreamObserver<Empty> responseObserver) {
-    Empty response = photoLikeService.deleteLike(request);
+  public void deletePhotoLike(PhotoLikeRequest request, StreamObserver<PhotoResponse> responseObserver) {
+    PhotoResponse response = photoLikeService.deleteLike(request);
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
@@ -83,7 +83,7 @@ public class GrpcPhotoService extends RangifflerPhotosServiceGrpc.RangifflerPhot
   @Nonnull
   private Pageable createPageable(PaginationRequest paginationRequest) {
     final int DEFAULT_PAGE = 0;
-    final int DEFAULT_SIZE = 20;
+    final int DEFAULT_SIZE = 10;
     final int MAX_PAGE_SIZE = 100;
 
     if (paginationRequest == null) {

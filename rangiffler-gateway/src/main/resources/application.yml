@@ -1,17 +1,28 @@
 server:
   port: 8080
-
 spring:
   application:
     name: rangiffler-gateway
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.grpc.autoconfigure.server.security.GrpcSecurityAutoConfiguration
+      - org.springframework.grpc.autoconfigure.server.GrpcServerAutoConfiguration
+  mvc:
+    static-path-pattern: "/resources/**"
   grpc:
+    server:
+      enabled: false
+      security:
+        enabled: false
     client:
       channels:
         countries-service:
           address: 127.0.0.1:9090
         userdata-service:
           address: 127.0.0.1:9091
-        countries-photos:
+        photos-service:
           address: 127.0.0.1:9093
   logging:
     file:
@@ -22,12 +33,15 @@ spring:
       org.springframework.security: INFO
       org.springframework.security.oauth2: INFO
       org.springframework.boot.autoconfigure: INFO
+      org.springframework.boot.graphql: INFO
   graphql:
     graphiql:
-      enabled: true
-    schema:
-      introspection:
-        enabled: true
+      enabled: false
+      endpoint:
+        graphql: /graphql
+    graphql:
+      introspection: true
+    exception-handling-enabled: true
   security:
     oauth2:
       resourceserver:

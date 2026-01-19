@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 
 import java.util.Date;
-
+import java.util.Objects;
 
 @Controller
 public class SessionQueryController {
@@ -18,8 +18,8 @@ public class SessionQueryController {
     if (principal != null) {
       return new SessionJson(
           principal.getClaim("sub"),
-          Date.from(principal.getIssuedAt()),
-          Date.from(principal.getExpiresAt())
+          Date.from(Objects.requireNonNull(principal.getIssuedAt())),
+          Date.from(Objects.requireNonNull(principal.getExpiresAt()))
       );
     } else {
       return SessionJson.empty();

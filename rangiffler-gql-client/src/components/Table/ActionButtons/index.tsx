@@ -7,7 +7,7 @@ import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 
 interface ActionButtonsInterface {
     userId: string;
-    friendStatus?: "FRIEND" | "INVITATION_SENT" | "INVITATION_RECEIVED";
+    friendStatus?: "NOT_FRIEND" | "FRIEND" | "INVITATION_SENT" | "INVITATION_RECEIVED";
 }
 
 export const ActionButtons: FC<ActionButtonsInterface> = ({userId, friendStatus}) => {
@@ -74,7 +74,7 @@ export const ActionButtons: FC<ActionButtonsInterface> = ({userId, friendStatus}
         });
     }
 
-    if (!friendStatus) {
+    if (friendStatus === "NOT_FRIEND") {
         return (
             <Button
                 startIcon={<AddOutlinedIcon/>}

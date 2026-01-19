@@ -32,4 +32,7 @@ public interface CountryRepository extends JpaRepository<CountryEntity, UUID> {
   )
   @Nonnull
   List<CountryEntity> findNeededCountries(@Param("neededCountries") List<UUID> neededCountries);
+
+  @Nonnull
+  List<CountryEntity> findAllByOrderByNameAsc();
 }

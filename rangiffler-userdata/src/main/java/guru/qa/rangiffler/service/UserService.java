@@ -9,11 +9,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public interface UserService {
-  @Nonnull UserResponse getCurrentUser(String username);
+  @Nonnull UserResponse findByUsername(String username);
 
   @Nonnull UserResponse findById(String id);
 
   @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username);
+
+  @Nonnull UserResponse findUserWithFriendStatus(String targetUserId, String currentUserId);
 
   @Nonnull UserUpdateResponse updateUser(UserUpdateRequest user);
 

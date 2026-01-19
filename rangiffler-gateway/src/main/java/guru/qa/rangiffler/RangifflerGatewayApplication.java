@@ -1,3 +1,5 @@
+package guru.qa.rangiffler;
+
 import guru.qa.rangiffler.service.utils.PropertiesLogger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

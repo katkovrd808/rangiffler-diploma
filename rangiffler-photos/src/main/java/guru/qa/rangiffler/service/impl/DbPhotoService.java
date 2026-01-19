@@ -80,11 +80,7 @@ public class DbPhotoService implements PhotoService {
   @Override
   @Transactional
   public @Nonnull PhotoResponse updatePhoto(PhotoUpdateRequest request) {
-    final String userId = request.getUserId();
-    if (userId.isEmpty()) {
-      LOG.info("### Attempting to update photo with null userId was rejected ###");
-      throw new IllegalArgumentException("User can't be null.");
-    }
+    final String userId = assertUserIdNotEmpty(request.getUserId());
 
     PhotoEntity pe = getRequiredPhoto(request.getId());
     if (!Objects.equals(pe.getUserId(), UUID.fromString(userId))) {
@@ -99,20 +95,19 @@ public class DbPhotoService implements PhotoService {
     pe.setDescription(request.getDescription());
     pe.setPhoto(request.getSrc().toByteArray());
 
-    return photoMapper.toProto(PhotoWithLikes.fromEntity(photoRepository.save(pe)), country);
+    final PhotoWithLikes photoWithLikes = PhotoWithLikes.fromEntity(photoRepository.save(pe));
+
+    return photoMapper.toProto(photoWithLikes, country);
   }
 
   @Override
   @Transactional
-  public @Nonnull Empty deletePhoto(PhotoDeleteRequest request) {
-    final String userId = request.getUserId();
-    if (userId.isEmpty()) {
-      LOG.info("### Attempting to delete photo with null userId was rejected ###");
-      throw new IllegalArgumentException("User can't be null.");
-    }
+  public @Nonnull PhotoDeleteResponse deletePhoto(PhotoDeleteRequest request) {
+    final String userId = assertUserIdNotEmpty(request.getUserId());
+    final String photoId = request.getId();
+    PhotoEntity pe = getRequiredPhoto(photoId);
 
-    PhotoEntity pe = getRequiredPhoto(request.getId());
-    if (!Objects.equals(pe.getUserId(), UUID.fromString(request.getUserId()))) {
+    if (!Objects.equals(pe.getUserId(), UUID.fromString(userId))) {
       LOG.info("### Attempting to delete photo of other user. ###");
       throw new SecurityException("User can only update their own photos.");
     }
@@ -120,7 +115,7 @@ public class DbPhotoService implements PhotoService {
     photoRepository.delete(pe);
     photoRepository.flush();
 
-    return Empty.getDefaultInstance();
+    return photoMapper.toPhotoDeleteResponse(photoId);
   }
 
   @Override
@@ -129,83 +124,38 @@ public class DbPhotoService implements PhotoService {
     final PhotoEntity pe = getRequiredPhoto(request.getId());
     CountryDto country = grpcCountriesClient.getCountryById(pe.getCountryId().toString())
       .orElseThrow(() -> new IllegalArgumentException("Can't find selected photo with country: " + pe.getCountryId()));
-
     final List<PhotoLikeEntity> photoLikes = photoLikeRepository.findPhotoLikesByPhotoId(pe.getId());
-
     return photoMapper.toProto(PhotoWithLikes.fromEntity(pe, photoLikes), country);
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public @Nonnull Page<PhotoResponse> getUserPhotos(FeedRequest request, Pageable pageable) {
+    final String userId = assertUserCreated(request.getUserId());
+    final Page<PhotoEntity> photoPage = photoRepository.findPhotosByUserId(UUID.fromString(userId), pageable);
+    return buildPhotoPage(photoPage, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public @Nonnull Page<PhotoResponse> getAllPhotos(FeedRequest request, Pageable pageable) {
-    final String userId = request.getUserId();
-    if (userId.isEmpty()) {
-      LOG.info("### Attempting to request photos without user_id param. ###");
-      throw new IllegalArgumentException("User id can't be null value.");
-    }
-
+    assertUserIdNotEmpty(request.getUserId());
     final Page<PhotoEntity> photoPage = photoRepository.findAll(pageable);
-    final List<PhotoEntity> photos = photoPage.getContent();
-
-    if (photos.isEmpty()) {
-      LOG.info("No photos found for friends");
-      return Page.empty(pageable);
-    }
-
-    LOG.info("Found {} photos to process", photos.size());
-
-    final List<UUID> photoIds = photos.stream().map(PhotoEntity::getId).toList();
-
-    final Map<UUID, List<PhotoLikeEntity>> likesByPhotoId = photoLikeRepository.findLikesByPhotoIds(photoIds)
-      .stream()
-      .collect(Collectors.groupingBy(like -> like.getPhoto().getId()));
-
-    LOG.info("Loaded likes for {} photos", likesByPhotoId.size());
-
-    final List<UUID> neededCountryIds = photos.stream()
-      .map(PhotoEntity::getCountryId)
-      .distinct()
-      .toList();
-
-    final Map<UUID, CountryDto> countryMap = grpcCountriesClient.getCountriesByIds(neededCountryIds).stream()
-      .collect(Collectors.toMap(CountryDto::id, Function.identity()));
-
-    LOG.info("Loaded {} countries", countryMap.size());
-
-    final List<PhotoResponse> photoResponses = photos.stream()
-      .map(photo -> {
-        final List<PhotoLikeEntity> likes = likesByPhotoId.getOrDefault(photo.getId(), Collections.emptyList());
-
-        final PhotoWithLikes photoWithLikes = PhotoWithLikes.fromEntity(photo, likes);
-
-        final CountryDto country = countryMap.get(photo.getCountryId());
-        if (country == null) {
-          LOG.info("### Can't find country. ###");
-          throw new IllegalArgumentException("Country not found for id: " + photo.getCountryId());
-        }
-        return photoMapper.toProto(photoWithLikes, country);
-      })
-      .toList();
-
-    return new PageImpl<>(
-      photoResponses,
-      pageable,
-      photoPage.getTotalElements()
-    );
+    return buildPhotoPage(photoPage, pageable);
   }
 
   @Override
   @Transactional(readOnly = true)
   public @Nonnull Page<PhotoResponse> getFriendsPhotos(FeedRequest request, Pageable pageable) {
-    final String userId = request.getUserId();
-    if (userId.isEmpty()) {
-      LOG.info("### Attempting to request photos without user_id param. ###");
-      throw new IllegalArgumentException("User id can't be null value.");
-    }
-
+    final String userId = assertUserIdNotEmpty(request.getUserId());
     final List<UUID> friendIds = grpcUserdataClient.getAllFriendsByUserId(userId).stream()
       .map(FriendDto::id)
       .toList();
+    final Page<PhotoEntity> photoPage = photoRepository.findFriendsPhoto(UUID.fromString(userId), friendIds, pageable);
+    return buildPhotoPage(photoPage, pageable);
+  }
 
-    final Page<PhotoEntity> photoPage = photoRepository.findFriendsPhoto(friendIds, pageable);
+  private @Nonnull Page<PhotoResponse> buildPhotoPage(Page<PhotoEntity> photoPage, Pageable pageable) {
     final List<PhotoEntity> photos = photoPage.getContent();
 
     if (photos.isEmpty()) {
@@ -216,6 +166,7 @@ public class DbPhotoService implements PhotoService {
     LOG.info("Found {} photos to process", photos.size());
 
     final List<UUID> photoIds = photos.stream().map(PhotoEntity::getId).toList();
+
     final Map<UUID, List<PhotoLikeEntity>> likesByPhotoId = photoLikeRepository.findLikesByPhotoIds(photoIds)
       .stream()
       .collect(Collectors.groupingBy(like -> like.getPhoto().getId()));
@@ -235,13 +186,14 @@ public class DbPhotoService implements PhotoService {
     final List<PhotoResponse> photoResponses = photos.stream()
       .map(photo -> {
         final List<PhotoLikeEntity> likes = likesByPhotoId.getOrDefault(photo.getId(), Collections.emptyList());
+
         final PhotoWithLikes photoWithLikes = PhotoWithLikes.fromEntity(photo, likes);
+
         final CountryDto country = countryMap.get(photo.getCountryId());
         if (country == null) {
           LOG.info("### Can't find country. ###");
           throw new IllegalArgumentException("Country not found for id: " + photo.getCountryId());
         }
-
         return photoMapper.toProto(photoWithLikes, country);
       })
       .toList();
@@ -269,10 +221,19 @@ public class DbPhotoService implements PhotoService {
       .orElseThrow(() -> new PhotoNotFoundException("Can't find photo with id " + id));
   }
 
-  private void assertUserCreated(String id) {
-    UserDto user = grpcUserdataClient.getUserById(id)
-      .orElseThrow(() -> new IllegalArgumentException("User with id " + id + " was not found."));
+  private @Nonnull String assertUserIdNotEmpty(String userId) {
+    if (userId.isEmpty()) {
+      LOG.info("### Attempting to request photos without user_id param. ###");
+      throw new IllegalArgumentException("User id can't be null value.");
+    }
+    return userId;
+  }
+
+  private @Nonnull String assertUserCreated(String userId) {
+    UserDto user = grpcUserdataClient.getUserById(userId)
+      .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " was not found."));
 
     LOG.info("### Received user with id: {} and username: {} from userdata service###", user.id(), user.username());
+    return userId;
   }
 }

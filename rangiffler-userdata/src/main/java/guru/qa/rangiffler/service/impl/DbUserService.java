@@ -50,7 +50,7 @@ public class DbUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public @Nonnull UserResponse getCurrentUser(String username) {
+  public @Nonnull UserResponse findByUsername(String username) {
     return userRepository.findByUsername(username)
       .map(userMapper::toProto)
       .orElseThrow(() -> new UserNotFoundException("Can't find user with username: " + username));
@@ -64,10 +64,21 @@ public class DbUserService implements UserService {
       .orElseThrow(() -> new UserNotFoundException("Can't find user with id: " + id));
   }
 
+  @Nonnull
+  public UserResponse findUserWithFriendStatus(String targetUserId, String currentUserId) {
+    return userRepository.findByIdWithFriendStatus(
+      UUID.fromString(targetUserId),
+        UUID.fromString(currentUserId)
+      )
+      .map(userMapper::toProto)
+      .orElseThrow(() -> new UserNotFoundException("Can't find user with ID: " + targetUserId));
+  }
+
   @Override
   @Transactional(readOnly = true)
   public @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username) {
-    Page<UserEntity> users = userRepository.findByUsernameNot(pageable, username);
+    final UserResponse currentUser = findByUsername(username);
+    Page<UserWithStatus> users = userRepository.findByIdNot(UUID.fromString(currentUser.getId()), pageable);
     return userMapper.toProtoList(users);
   }
 
@@ -208,12 +219,12 @@ public class DbUserService implements UserService {
           friendshipStatusToSet = FriendshipStatus.ACCEPTED;
           friendshipRepository.save(fe);
         } else {
-          throw new InvalidFriendshipOperationException("Cannot accept your own friendship request");
+          throw new InvalidFriendshipOperationException("Can't accept your own friendship request");
         }
       } else if (status == FriendshipStatus.ACCEPTED) {
         friendshipStatusToSet = FriendshipStatus.ACCEPTED;
       } else {
-        throw new InvalidFriendshipOperationException("Cannot accept friendship with status: " + status);
+        throw new InvalidFriendshipOperationException("Can't accept friendship with status: " + status);
       }
     } else {
       throw new FriendshipNotFoundException("Friendship request not found between users: " + username + " and " + targetUsername);
@@ -307,20 +318,6 @@ public class DbUserService implements UserService {
 
     UserWithStatus declined = UserWithStatus.fromEntity(target, FriendshipStatus.DECLINED, isRequester);
     return userMapper.toProtoFriendshipResponse(declined);
-  }
-
-  //TODO move to GATEWAY SERVICE
-  public static boolean isPhotoString(String photo) {
-    return photo != null && photo.startsWith("data:image");
-  }
-
-  private @Nonnull String cleanString(String input) {
-    if (input == null) {
-      return "";
-    }
-    return input.replaceAll("\\x00", "")
-      .replaceAll("[\\x00-\\x1F\\x7F]", "")
-      .trim();
   }
 
   @Nonnull

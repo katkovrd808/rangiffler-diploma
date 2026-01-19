@@ -14,9 +14,11 @@ public interface PhotoService {
 
   @Nonnull PhotoResponse updatePhoto(PhotoUpdateRequest photo);
 
-  @Nonnull Empty deletePhoto(PhotoDeleteRequest photo);
+  @Nonnull PhotoDeleteResponse deletePhoto(PhotoDeleteRequest photo);
 
   @Nonnull PhotoResponse getPhotoWithLikes(PhotoWithLikesRequest photo);
+
+  @Nonnull Page<PhotoResponse> getUserPhotos(FeedRequest request, Pageable pageable);
 
   @Nonnull Page<PhotoResponse> getAllPhotos(FeedRequest request, Pageable pageable);
 

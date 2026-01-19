@@ -1,6 +1,5 @@
 package guru.qa.rangiffler.service.impl;
 
-import com.google.protobuf.Empty;
 import guru.qa.rangiffler.api.GrpcCountriesClient;
 import guru.qa.rangiffler.api.GrpcUserdataClient;
 import guru.qa.rangiffler.data.PhotoEntity;
@@ -60,7 +59,7 @@ public class DbPhotoService implements PhotoService {
   @Transactional
   public @Nonnull PhotoResponse createPhoto(PhotoRequest request) {
     final String userId = request.getUserId();
-    if (userId.isEmpty()) {
+    if (userId == null || userId.isEmpty()) {
       LOG.info("### Attempting to create photo with null userId was rejected ###");
       throw new IllegalArgumentException("User can't be null.");
     }

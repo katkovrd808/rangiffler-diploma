@@ -46,6 +46,9 @@ public class FeedServiceImpl implements FeedService {
 
   @Transactional(readOnly = true)
   public @Nonnull FeedResponse getFeed(FeedRequest request, Pageable pageable) {
+    if (pageable == null) {
+      throw new NullPointerException("Pageable can't be null for method execution.");
+    }
     final Page<PhotoResponse> photoPage = request.getWithFriends()
       ? photoService.getFriendsPhotos(request, pageable)
       : photoService.getUserPhotos(request, pageable);

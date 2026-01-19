@@ -62,6 +62,9 @@ public class DbCountryService implements CountryService {
   @Override
   @Transactional(readOnly = true)
   public @Nonnull NeededCountriesResponse findNeededCountries(List<UUID> neededCountriesIds) {
+    if (neededCountriesIds == null || neededCountriesIds.isEmpty()) {
+      throw new IllegalArgumentException("Countries list can't be null or empty value");
+    }
     List<CountryEntity> countries = countryRepository.findNeededCountries(neededCountriesIds);
     return countryMapper.toNeededCountriesProto(countries);
   }

@@ -10,17 +10,22 @@ import org.springframework.data.repository.query.Param;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public interface PhotoRepository extends JpaRepository<PhotoEntity, UUID> {
-  @Query(
-    """
-      SELECT p
-      FROM PhotoEntity p
-      WHERE p.userId IN :friendIds
-      ORDER BY p.createdDate DESC
-      """)
+  @Query(value = """
+    SELECT p
+    FROM PhotoEntity p
+    WHERE p.userId IN :friendIds OR p.userId = :currentUserId
+    ORDER BY p.createdDate DESC
+    """)
   @Nonnull
-  Page<PhotoEntity> findFriendsPhoto(@Param("friendIds") List<UUID> friendIds, Pageable pageable);
+  Page<PhotoEntity> findFriendsPhoto(@Param("currentUserId") UUID currentUserId,
+                                     @Param("friendIds") List<UUID> friendIds,
+                                     Pageable pageable);
+
+  @Nonnull
+  Page<PhotoEntity> findPhotosByUserId(UUID userId, Pageable pageable);
 }

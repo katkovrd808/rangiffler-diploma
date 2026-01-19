@@ -14,7 +14,8 @@ public class GrpcClientsConfiguration {
     GrpcChannelFactory grpcChannelFactory
   ) {
     Channel channel = grpcChannelFactory.createChannel("countries-service");
-    return RangifflerCountriesServiceGrpc.newBlockingStub(channel);
+    return RangifflerCountriesServiceGrpc.newBlockingStub(channel)
+      .withMaxInboundMessageSize(1024 * 1024);
   }
 
   @Bean
@@ -22,6 +23,7 @@ public class GrpcClientsConfiguration {
     GrpcChannelFactory grpcChannelFactory
   ) {
     Channel channel = grpcChannelFactory.createChannel("userdata-service");
-    return RangifflerUserdataServiceGrpc.newBlockingStub(channel);
+    return RangifflerUserdataServiceGrpc.newBlockingStub(channel)
+      .withMaxInboundMessageSize(1024 * 1024);
   }
 }

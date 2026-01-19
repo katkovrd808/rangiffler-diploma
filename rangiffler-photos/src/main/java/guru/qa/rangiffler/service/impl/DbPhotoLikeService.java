@@ -1,6 +1,5 @@
 package guru.qa.rangiffler.service.impl;
 
-import com.google.protobuf.Empty;
 import guru.qa.rangiffler.api.GrpcCountriesClient;
 import guru.qa.rangiffler.api.GrpcUserdataClient;
 import guru.qa.rangiffler.data.PhotoEntity;
@@ -69,13 +68,18 @@ public class DbPhotoLikeService implements PhotoLikeService {
 
     assertUserCreated(userId);
 
-    final PhotoEntity photo = getRequiredPhoto(photoId);
+    PhotoEntity photo = getRequiredPhoto(photoId);
     final CountryDto country = getCountryDto(photo.getCountryId().toString());
 
     final Optional<PhotoLikeEntity> existing = checkExistingLike(photoId, userId);
 
     if (existing.isPresent()) {
-      photoLikeRepository.save(existing.get());
+      final PhotoLikeEntity like = existing.get();
+      photoLikeRepository.delete(like);
+      photoLikeRepository.flush();
+
+      photo = getRequiredPhoto(photoId);
+
       return photoMapper.toProto(PhotoWithLikes.fromEntity(photo), country);
     }
 
@@ -83,14 +87,16 @@ public class DbPhotoLikeService implements PhotoLikeService {
     ple.setPhoto(photo);
     ple.setUserId(UUID.fromString(userId));
 
+    photo.getPhotoLikes().add(ple);
+
     photoLikeRepository.save(ple);
 
     return photoMapper.toProto(PhotoWithLikes.fromEntity(photo), country);
   }
 
+  @Nonnull
   @Override
-  @Transactional(readOnly = true)
-  public @Nonnull Empty deleteLike(PhotoLikeRequest request) {
+  public PhotoResponse deleteLike(PhotoLikeRequest request) {
     final String userId = request.getLike().getUserId();
     final String photoId = request.getPhotoId();
 
@@ -111,15 +117,10 @@ public class DbPhotoLikeService implements PhotoLikeService {
     photoLikeRepository.delete(photoLike);
     photoLikeRepository.flush();
 
-    return Empty.getDefaultInstance();
-  }
+    final PhotoEntity photo = getRequiredPhoto(photoId);
+    final CountryDto country = getCountryDto(photo.getCountryId().toString());
 
-  @Nonnull
-  @Override
-  @Transactional
-  public List<PhotoLikeEntity> getPhotoWithLikes(PhotoWithLikesRequest request) {
-    PhotoEntity pe = getRequiredPhoto(request.getId());
-    return photoLikeRepository.findPhotoLikesByPhotoId(pe.getId());
+    return photoMapper.toProto(PhotoWithLikes.fromEntity(photo), country);
   }
 
   private @Nonnull CountryDto getCountryDto(String countryId) {

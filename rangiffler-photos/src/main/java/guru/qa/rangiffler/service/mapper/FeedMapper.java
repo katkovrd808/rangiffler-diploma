@@ -4,6 +4,7 @@ import guru.qa.rangiffler.grpc.*;
 import guru.qa.rangiffler.model.CountryDto;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -12,30 +13,32 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 @ParametersAreNonnullByDefault
 public interface FeedMapper {
-  default FeedResponse toProto(Page<PhotoResponse> photoPage, List<CountryDto> statistic) {
-    List<PhotoResponse> photosWithPagination = photoPage.getContent().stream()
-      .map(photo -> addPaginationToPhoto(photo, photoPage))
-      .toList();
 
+  default @Nonnull FeedResponse toProto(Page<PhotoResponse> photoPage, List<CountryDto> statistic) {
     return FeedResponse.newBuilder()
-      .addAllPhotos(photosWithPagination)
+      .setPhotos(toStatisticPhotos(photoPage))
       .setStatistic(toCountryStatisticProtoList(statistic))
       .build();
   }
 
-  private PhotoResponse addPaginationToPhoto(PhotoResponse photo, Page<?> page) {
-    return photo.toBuilder()
-      .setPaginationResponse(createPaginationResponse(page))
+  private @Nonnull FeedPhotos toStatisticPhotos(Page<PhotoResponse> photos) {
+    if (photos == null || photos.isEmpty()) {
+      return FeedPhotos.getDefaultInstance();
+    }
+
+    return FeedPhotos.newBuilder()
+      .addAllPhotos(photos.getContent().stream().toList())
+      .setPaginationResponse(createPaginationResponse(photos))
       .build();
   }
 
-  private UserCountryStatistic toCountryStatisticProtoList(List<CountryDto> statistic) {
+  private @Nonnull UserCountryStatistic toCountryStatisticProtoList(List<CountryDto> statistic) {
     if (statistic == null || statistic.isEmpty()) {
       return UserCountryStatistic.getDefaultInstance();
     }
 
     return UserCountryStatistic.newBuilder()
-      .addAllCountry(statistic.stream()
+      .addAllCountries(statistic.stream()
         .map(c -> CountryStatistic.newBuilder()
           .setCode(c.code())
           .setCount(c.count())

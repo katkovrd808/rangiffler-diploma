@@ -44,14 +44,17 @@ public class FeedServiceImpl implements FeedService {
     this.grpcCountriesClient = grpcCountriesClient;
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public @Nonnull FeedResponse getFeed(FeedRequest request, Pageable pageable) {
     final Page<PhotoResponse> photoPage = request.getWithFriends()
       ? photoService.getFriendsPhotos(request, pageable)
-      : photoService.getAllPhotos(request, pageable);
+      : photoService.getUserPhotos(request, pageable);
 
-    final List<StatisticEntity> userCountriesStatistic = statisticService.getUserCountriesStatistic(request);
-    final List<CountryDto> countries = getCountriesFromStatistic(userCountriesStatistic);
+    final List<StatisticEntity> countriesStatistic = request.getWithFriends()
+      ? statisticService.getUserCountriesStatisticWithFriends(request)
+      : statisticService.getUserCountriesStatistic(request);
+
+    final List<CountryDto> countries = getCountriesFromStatistic(countriesStatistic);
 
     return feedMapper.toProto(photoPage, countries);
   }

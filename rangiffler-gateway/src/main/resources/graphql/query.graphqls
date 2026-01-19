@@ -1,37 +1,66 @@
 scalar Date
 
 type Query {
+    session: Session!
     countries: [Country!]!
+    country(code: String, id: String): Country!
     user: User!
-    users(page:Int, size:Int, searchQuery:String): UserConnection
-    feed(withFriends: Boolean!): Feed!
+    users(page:Int = 0, size:Int = 10, searchQuery:String): UsersSlice
+    feed(page:Int = 0, size:Int = 12, withFriends: Boolean!): Feed!
 }
 
 type Mutation {
     user(input: UserInput!): User!
-    photo(input: PhotoInput!): Photo!
-    deletePhoto(id: ID!): Boolean
     friendship(input: FriendshipInput!): User!
+    photo(input: PhotoInput!): Photo!
+    deletePhoto(id: ID!): String
+}
+
+type Session {
+    username: String
+    issuedAt: Date
+    expiresAt: Date
 }
 
 type User {
     id: ID!
-    username: String!
+    username: String
     firstname: String
     surname: String
     avatar: String
     friendStatus: FriendStatus
-    friends(page:Int, size:Int, searchQuery:String): UserConnection
-    incomeInvitations(page:Int, size:Int, searchQuery:String): UserConnection
-    outcomeInvitations(page:Int, size:Int, searchQuery:String): UserConnection
-    location: Country
+    friends(page:Int = 0, size:Int = 10, searchQuery:String): UsersSlice
+    incomeInvitations(page:Int = 0, size:Int = 10, searchQuery:String): UsersSlice
+    outcomeInvitations(page:Int = 0, size:Int = 10, searchQuery:String): UsersSlice
+    location: UserLocation
+}
+
+type UserLocation {
+    flag: String!
+    code: String!
+    name: String!
 }
 
 type Feed {
     username: String!
     withFriends: Boolean!
-    photos(page:Int, size:Int): PhotoConnection
+    photos(page:Int, size:Int): PhotoSlice
     stat: [Stat!]
+}
+
+type PhotoSlice {
+    content: [Photo]!
+    pageInfo: PageInfo!
+}
+
+type UsersSlice {
+    content: [User]!
+    pageInfo: PageInfo!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
 }
 
 type Stat {
@@ -41,6 +70,7 @@ type Stat {
 
 type Photo {
     id: ID!
+    user: User
     src: String!
     country: Country!
     description: String!
@@ -55,11 +85,10 @@ type Likes {
 
 type Like {
     user: ID!
-    username: String!
-    creationDate: Date!
 }
 
 type Country {
+    id: String!
     flag: String!
     code: String!
     name: String!

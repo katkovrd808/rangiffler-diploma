@@ -1,6 +1,7 @@
 package guru.qa.rangiffler.service.mapper;
 
 import com.google.protobuf.ByteString;
+import guru.qa.rangiffler.data.FriendshipEntity;
 import guru.qa.rangiffler.data.UserEntity;
 import guru.qa.rangiffler.data.projection.UserWithStatus;
 import guru.qa.rangiffler.grpc.*;
@@ -27,6 +28,18 @@ public interface UserMapper {
       .build();
   }
 
+  default @Nonnull UserResponse toProto(UserWithStatus user) {
+    return UserResponse.newBuilder()
+      .setId(user.id().toString())
+      .setUsername(user.username())
+      .setFirstname(user.firstname() != null ? user.firstname() : "")
+      .setSurname(user.surname() != null ? user.surname() : "")
+      .setPhoto(user.photo() != null ? map(user.photo()) : ByteString.EMPTY)
+      .setCountryId(user.countryId().toString())
+      .setFriendStatus(resolveStatus(user))
+      .build();
+  }
+
   default @Nonnull UserUpdateResponse toUpdateProto(UserEntity user) {
     return UserUpdateResponse.newBuilder()
       .setId(user.getId().toString())
@@ -38,7 +51,7 @@ public interface UserMapper {
       .build();
   }
 
-  default @Nonnull UsersPaginatedResponse toProtoList(Page<UserEntity> users) {
+  default @Nonnull UsersPaginatedResponse toProtoList(Page<UserWithStatus> users) {
     return users.isEmpty() ? UsersPaginatedResponse.getDefaultInstance() :
       UsersPaginatedResponse.newBuilder().addAllUsers(
           users.stream()

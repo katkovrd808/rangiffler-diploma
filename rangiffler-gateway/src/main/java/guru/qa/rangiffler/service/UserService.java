@@ -1,29 +1,36 @@
 package guru.qa.rangiffler.service;
 
-import guru.qa.rangiffler.model.graphql.UserGql;
+import guru.qa.rangiffler.model.graphql.userdata.UserGql;
+import guru.qa.rangiffler.model.graphql.userdata.UserInputGql;
+import guru.qa.rangiffler.model.graphql.userdata.UsersSliceGql;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public interface UserService {
   @Nonnull
-  UserGql findByUsername(String username);
+  UserGql findUser(@Nullable String username, @Nullable UUID userId);
 
   @Nonnull
-  Slice<UserGql> allUsers(Pageable pageable);
+  UsersSliceGql allUsers(Pageable pageable, String username);
 
   @Nonnull
-  UserGql updateUser(UserGql user);
+  UserGql updateUser(String username, UserInputGql user);
 
   @Nonnull
-  Slice<UserGql> friends(String username, Pageable pageable);
+  UsersSliceGql friends(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull
-  Slice<UserGql> incomeInvitations(String username, Pageable pageable);
+  UsersSliceGql incomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull
-  Slice<UserGql> outcomeInvitations(String username, Pageable pageable);
+  UsersSliceGql outcomeInvitations(Pageable pageable, String username, @Nullable String searchQuery);
+
+  @Nonnull
+  UserGql friendship(String currentUser, String targetUser, FriendshipAction friendshipAction);
 }

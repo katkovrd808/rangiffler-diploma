@@ -13,6 +13,7 @@ public class GrpcCountriesClientConfiguration {
     GrpcChannelFactory grpcChannelFactory
   ) {
     Channel channel = grpcChannelFactory.createChannel("countries-service");
-    return RangifflerCountriesServiceGrpc.newBlockingStub(channel);
+    return RangifflerCountriesServiceGrpc.newBlockingStub(channel)
+      .withMaxInboundMessageSize(1024 * 1024);
   }
 }

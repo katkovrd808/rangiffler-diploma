@@ -4,20 +4,18 @@ const GET_INVITATIONS = gql(`
     query GetInvitations($page: Int, $size: Int, $searchQuery: String) {
         user {
             incomeInvitations(page: $page, size: $size, searchQuery: $searchQuery) {
-                edges {
-                    node {
-                        id
-                        username
-                        firstname
-                        surname
-                        avatar
-                        location {
-                            code
-                            name
-                            flag
-                        }
-                        friendStatus
+                content {
+                    id
+                    username
+                    firstname
+                    surname
+                    avatar
+                    location {
+                        code
+                        name
+                        flag
                     }
+                    friendStatus
                 }
                 pageInfo {
                     hasPreviousPage
@@ -41,7 +39,7 @@ export const useGetInvitations = (req: getInvitationsRequestType) => {
         }
     });
     return {
-        data: data?.user?.incomeInvitations?.edges?.map((e: any) => e?.node) ?? [],
+        data: data?.user?.incomeInvitations?.content ?? [],
         hasPreviousPage: data?.user?.incomeInvitations?.pageInfo?.hasPreviousPage,
         hasNextPage: data?.user?.incomeInvitations?.pageInfo?.hasNextPage,
         loading,

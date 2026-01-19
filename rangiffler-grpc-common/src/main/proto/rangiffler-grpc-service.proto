@@ -3,6 +3,7 @@ syntax = "proto3";
 package guru.qa.grpc.rangiffler;
 
 import "google/protobuf/empty.proto";
+import "google/type/date.proto";
 
 option java_multiple_files = true;
 option java_package = "guru.qa.rangiffler.grpc";
@@ -10,6 +11,7 @@ option java_outer_classname = "RangifflerUserdataProto";
 
 service RangifflerUserdataService {
     rpc GetUser(UserRequest) returns (UserResponse);
+    rpc GetUserWithFriendStatus(UserWithStatusRequest) returns (UserResponse);
     rpc AllUsers(UsersPaginatedRequest) returns (UsersPaginatedResponse);
     rpc UpdateUser(UserUpdateRequest) returns (UserUpdateResponse);
     rpc AllFriendsPaginated(AllFriendsPaginatedRequest) returns (AllFriendsPaginatedResponse);
@@ -31,9 +33,9 @@ service RangifflerCountriesService {
 service RangifflerPhotosService {
     rpc AddPhoto(PhotoRequest) returns (PhotoResponse);
     rpc UpdatePhoto(PhotoUpdateRequest) returns (PhotoResponse);
-    rpc DeletePhoto(PhotoDeleteRequest) returns (google.protobuf.Empty);
+    rpc DeletePhoto(PhotoDeleteRequest) returns (PhotoDeleteResponse);
     rpc AddPhotoLike(PhotoLikeRequest) returns (PhotoResponse);
-    rpc DeletePhotoLike(PhotoLikeRequest) returns (google.protobuf.Empty);
+    rpc DeletePhotoLike(PhotoLikeRequest) returns (PhotoResponse);
     rpc GetPhotoWithLikes(PhotoWithLikesRequest) returns (PhotoResponse);
     rpc GetUserFeed(FeedRequest) returns (FeedResponse);
 }
@@ -72,6 +74,11 @@ message UserUpdateResponse {
 message UserRequest {
     string username = 1;
     optional string id = 2;
+}
+
+message UserWithStatusRequest {
+    string target_user_id = 1;
+    string current_user_id = 2;
 }
 
 message UserResponse {
@@ -202,7 +209,11 @@ message PhotoResponse {
     bytes src = 5;
     CountryPhoto country = 3;
     repeated Like likes = 6;
-    PaginationResponse pagination_response = 7;
+    google.type.Date date_created = 7;
+}
+
+message PhotoDeleteResponse {
+    string id = 1;
 }
 
 message PhotoWithLikesRequest {
@@ -228,7 +239,7 @@ message PhotoLikeRequest {
 }
 
 message UserCountryStatistic {
-    repeated CountryStatistic country = 2;
+    repeated CountryStatistic countries = 2;
 }
 
 message FeedRequest {
@@ -238,8 +249,13 @@ message FeedRequest {
 }
 
 message FeedResponse {
-    repeated PhotoResponse photos = 1;
+    FeedPhotos photos = 1;
     UserCountryStatistic statistic = 2;
+}
+
+message FeedPhotos {
+    repeated PhotoResponse photos = 1;
+    PaginationResponse pagination_response = 2;
 }
 
 enum FriendStatus {

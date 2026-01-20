@@ -24,6 +24,8 @@ export const PhotoCard: FC<PhotoCardInterface> = ({ photo, onEditClick, withFrie
 
     const isPhotoOwner = user?.id === photo?.user?.id;
 
+    const showManagementButtons = isPhotoOwner && !withFriends
+
 
     const { deletePhoto } = useDeletePhoto({
         onError: () => snackbar.showSnackBar("Can not delete post", "error"),
@@ -117,30 +119,32 @@ export const PhotoCard: FC<PhotoCardInterface> = ({ photo, onEditClick, withFrie
                         {photo.description}
                     </Typography>
                 </Box>
-                <Box
-                    sx={{
-                        display: "flex",
-                        marginTop: 2,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    {isPhotoOwner && (
-                        <Box
-                            sx={{
-                                display: "flex",
-                                marginTop: 2,
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
+
+                {showManagementButtons && (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            marginTop: 2,
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            sx={{ margin: 1, width: "100%" }}
+                            onClick={() => onEditClick(photo)}
                         >
-                            <Button variant="contained" sx={{ margin: 1, width: "100%" }}
-                                onClick={() => onEditClick(photo)}>Edit</Button>
-                            <Button variant="outlined" sx={{ margin: 1, width: "100%" }}
-                                onClick={handleDeletePhoto}>Delete</Button>
-                        </Box>
-                    )}
-                </Box>
+                            Edit
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            sx={{ margin: 1, width: "100%" }}
+                            onClick={handleDeletePhoto}
+                        >
+                            Delete
+                        </Button>
+                    </Box>
+                )}
             </Box>
         </Paper>
     );

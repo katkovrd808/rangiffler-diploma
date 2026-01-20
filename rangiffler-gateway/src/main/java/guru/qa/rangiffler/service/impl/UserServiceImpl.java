@@ -56,8 +56,8 @@ public class UserServiceImpl implements UserService {
 
   @Nonnull
   @Override
-  public UsersSliceGql allUsers(Pageable pageable, String username) {
-    UsersPaginatedResponse response = grpcUserdataClient.findAllExceptCurrent(pageable, username);
+  public UsersSliceGql allUsers(Pageable pageable, String username, @Nullable String searchQuery) {
+    UsersPaginatedResponse response = grpcUserdataClient.findAllExceptCurrent(pageable, username, searchQuery);
     CountriesResponse countriesResponse = grpcCountriesClient.allCountries();
     return userMapper.toUsersListGql(response, countriesResponse);
   }

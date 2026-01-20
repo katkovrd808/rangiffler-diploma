@@ -13,7 +13,7 @@ public interface UserService {
 
   @Nonnull UserResponse findById(String id);
 
-  @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username);
+  @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull UserResponse findUserWithFriendStatus(String targetUserId, String currentUserId);
 

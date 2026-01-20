@@ -119,13 +119,14 @@ public interface UserMapper {
   }
 
   @Nonnull
-  default UsersPaginatedRequest toProtoUsersRequest(Pageable pageable, String username) {
+  default UsersPaginatedRequest toProtoUsersRequest(Pageable pageable, String username, @Nullable String searchQuery) {
     if (username == null || username.isEmpty()) {
       return UsersPaginatedRequest.getDefaultInstance();
     }
 
     final UsersPaginatedRequest.Builder builder = UsersPaginatedRequest.newBuilder();
     builder.setExcludeUsername(username);
+    builder.setSearchQuery(searchQuery);
 
     if (pageable.isPaged()) {
       PaginationRequest paginationRequest = PaginationRequest.newBuilder()

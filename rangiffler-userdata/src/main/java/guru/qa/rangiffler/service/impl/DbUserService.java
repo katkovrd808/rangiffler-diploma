@@ -76,9 +76,9 @@ public class DbUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username) {
+  public @Nonnull UsersPaginatedResponse getAllUsers(Pageable pageable, String username, @Nullable String searchQuery) {
     final UserResponse currentUser = findByUsername(username);
-    Page<UserWithStatus> users = userRepository.findByIdNot(UUID.fromString(currentUser.getId()), pageable);
+    Page<UserWithStatus> users = userRepository.findByIdNot(UUID.fromString(currentUser.getId()), searchQuery, pageable);
     return userMapper.toProtoList(users);
   }
 

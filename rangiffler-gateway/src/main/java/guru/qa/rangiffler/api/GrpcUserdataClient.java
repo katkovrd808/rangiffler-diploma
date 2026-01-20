@@ -49,9 +49,9 @@ public class GrpcUserdataClient {
   }
 
   @Nonnull
-  public UsersPaginatedResponse findAllExceptCurrent(Pageable pageable, String username) {
+  public UsersPaginatedResponse findAllExceptCurrent(Pageable pageable, String username, @Nullable String searchQuery) {
     try {
-      UsersPaginatedRequest request = userMapper.toProtoUsersRequest(pageable, username);
+      UsersPaginatedRequest request = userMapper.toProtoUsersRequest(pageable, username, searchQuery);
       return rangifflerUserdataServiceBlockingStub.allUsers(request);
     } catch (StatusRuntimeException e) {
       throw grpcExceptionHandler.handleGraphQLError(e);

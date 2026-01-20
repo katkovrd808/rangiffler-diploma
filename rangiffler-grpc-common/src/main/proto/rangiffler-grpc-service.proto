@@ -96,7 +96,8 @@ message UserResponse {
 
 message UsersPaginatedRequest {
     string exclude_username = 1;
-    PaginationRequest pagination_request = 2;
+    optional string search_query = 2;
+    PaginationRequest pagination_request = 3;
 }
 
 message UsersPaginatedResponse {

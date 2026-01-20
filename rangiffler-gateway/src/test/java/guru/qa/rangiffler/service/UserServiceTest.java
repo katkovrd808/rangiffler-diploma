@@ -175,13 +175,13 @@ public class UserServiceTest {
 
     final UsersSliceGql expectedSlice = new UsersSliceGql(List.of(), null);
 
-    when(grpcUserdataClient.findAllExceptCurrent(pageable, username)).thenReturn(usersResponse);
+    when(grpcUserdataClient.findAllExceptCurrent(pageable, username, null)).thenReturn(usersResponse);
     when(grpcCountriesClient.allCountries()).thenReturn(countriesResponse);
     when(userMapper.toUsersListGql(usersResponse, countriesResponse)).thenReturn(expectedSlice);
 
-    final UsersSliceGql actualSlice = userServiceImpl.allUsers(pageable, username);
+    final UsersSliceGql actualSlice = userServiceImpl.allUsers(pageable, username, null);
 
-    verify(grpcUserdataClient).findAllExceptCurrent(pageable, username);
+    verify(grpcUserdataClient).findAllExceptCurrent(pageable, username, null);
     verify(grpcCountriesClient).allCountries();
     verify(userMapper).toUsersListGql(usersResponse, countriesResponse);
     assertEquals(expectedSlice, actualSlice);
@@ -432,13 +432,13 @@ public class UserServiceTest {
     final CountriesResponse countriesResponse = CountriesResponse.newBuilder().build();
     final UsersSliceGql expectedSlice = new UsersSliceGql(List.of(), null);
 
-    when(grpcUserdataClient.findAllExceptCurrent(pageable, username)).thenReturn(emptyResponse);
+    when(grpcUserdataClient.findAllExceptCurrent(pageable, username, null)).thenReturn(emptyResponse);
     when(grpcCountriesClient.allCountries()).thenReturn(countriesResponse);
     when(userMapper.toUsersListGql(emptyResponse, countriesResponse)).thenReturn(expectedSlice);
 
-    final UsersSliceGql actualSlice = userServiceImpl.allUsers(pageable, username);
+    final UsersSliceGql actualSlice = userServiceImpl.allUsers(pageable, username, null);
 
-    verify(grpcUserdataClient).findAllExceptCurrent(pageable, username);
+    verify(grpcUserdataClient).findAllExceptCurrent(pageable, username, null);
     verify(grpcCountriesClient).allCountries();
     verify(userMapper).toUsersListGql(emptyResponse, countriesResponse);
     assertEquals(expectedSlice, actualSlice);

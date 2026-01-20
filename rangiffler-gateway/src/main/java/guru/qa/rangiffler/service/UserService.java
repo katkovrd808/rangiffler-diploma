@@ -16,7 +16,7 @@ public interface UserService {
   UserGql findUser(@Nullable String username, @Nullable UUID userId);
 
   @Nonnull
-  UsersSliceGql allUsers(Pageable pageable, String username);
+  UsersSliceGql allUsers(Pageable pageable, String username, @Nullable String searchQuery);
 
   @Nonnull
   UserGql updateUser(String username, UserInputGql user);

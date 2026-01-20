@@ -67,7 +67,8 @@ public class GrpcUserService extends RangifflerUserdataServiceGrpc.RangifflerUse
   public void allUsers(UsersPaginatedRequest request, StreamObserver<UsersPaginatedResponse> responseObserver) {
     UsersPaginatedResponse response = userService.getAllUsers(
       createPageable(request.getPaginationRequest()),
-      request.getExcludeUsername());
+      request.getExcludeUsername(),
+      request.getSearchQuery());
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }

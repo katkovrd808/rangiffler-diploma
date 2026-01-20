@@ -208,7 +208,7 @@ class UserServiceTest {
     when(userRepository.findByIdNot(currentUserId, pageable)).thenReturn(userPage);
     when(userMapper.toProtoList(userPage)).thenReturn(expectedResponse);
 
-    final UsersPaginatedResponse actualResponse = dbUserService.getAllUsers(pageable, username);
+    final UsersPaginatedResponse actualResponse = dbUserService.getAllUsers(pageable, username, null);
 
     verify(userRepository).findByUsername(username);
     verify(userRepository).findByIdNot(currentUserId, pageable);

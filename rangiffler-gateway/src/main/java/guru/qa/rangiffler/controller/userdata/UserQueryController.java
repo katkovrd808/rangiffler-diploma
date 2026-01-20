@@ -43,9 +43,10 @@ public class UserQueryController {
   @ResponseStatus(HttpStatus.OK)
   public @Nonnull UsersSliceGql users(@AuthenticationPrincipal Jwt principal,
                                       @Argument int size,
-                                      @Argument int page) {
+                                      @Argument int page,
+                                      @Argument @Nullable String searchQuery) {
     final String principalUsername = principal.getClaim("sub");
-    return userService.allUsers(PageRequest.of(page, size), principalUsername);
+    return userService.allUsers(PageRequest.of(page, size), principalUsername, searchQuery);
   }
 
   @SchemaMapping(typeName = "User", field = "friends")

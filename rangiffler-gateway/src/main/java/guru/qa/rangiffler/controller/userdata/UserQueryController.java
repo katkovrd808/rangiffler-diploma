@@ -34,28 +34,25 @@ public class UserQueryController {
 
   @QueryMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  UserGql user(@AuthenticationPrincipal Jwt principal) {
+  public @Nonnull UserGql user(@AuthenticationPrincipal Jwt principal) {
     final String principalUsername = principal.getClaim("sub");
     return userService.findUser(principalUsername, null);
   }
 
   @QueryMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  UsersSliceGql users(@AuthenticationPrincipal Jwt principal,
-                      @Argument int size,
-                      @Argument int page) {
+  public @Nonnull UsersSliceGql users(@AuthenticationPrincipal Jwt principal,
+                                      @Argument int size,
+                                      @Argument int page) {
     final String principalUsername = principal.getClaim("sub");
     return userService.allUsers(PageRequest.of(page, size), principalUsername);
   }
 
   @SchemaMapping(typeName = "User", field = "friends")
-  @Nonnull
-  UsersSliceGql friends(UserGql user,
-                         @Argument int page,
-                         @Argument int size,
-                         @Argument @Nullable String searchQuery) {
+  public @Nonnull UsersSliceGql friends(UserGql user,
+                                        @Argument int page,
+                                        @Argument int size,
+                                        @Argument @Nullable String searchQuery) {
     return userService.friends(
       PageRequest.of(page, size),
       user.username(),
@@ -64,11 +61,10 @@ public class UserQueryController {
   }
 
   @SchemaMapping(typeName = "User", field = "incomeInvitations")
-  @Nonnull
-  UsersSliceGql incomeInvitations(UserGql user,
-                                   @Argument int page,
-                                   @Argument int size,
-                                   @Argument @Nullable String searchQuery) {
+  public @Nonnull UsersSliceGql incomeInvitations(UserGql user,
+                                                  @Argument int page,
+                                                  @Argument int size,
+                                                  @Argument @Nullable String searchQuery) {
     return userService.incomeInvitations(
       PageRequest.of(page, size),
       user.username(),
@@ -77,11 +73,10 @@ public class UserQueryController {
   }
 
   @SchemaMapping(typeName = "User", field = "outcomeInvitations")
-  @Nonnull
-  UsersSliceGql outcomeInvitations(UserGql user,
-                                    @Argument int page,
-                                    @Argument int size,
-                                    @Argument @Nullable String searchQuery) {
+  public @Nonnull UsersSliceGql outcomeInvitations(UserGql user,
+                                                   @Argument int page,
+                                                   @Argument int size,
+                                                   @Argument @Nullable String searchQuery) {
     return userService.outcomeInvitations(
       PageRequest.of(page, size),
       user.username(),

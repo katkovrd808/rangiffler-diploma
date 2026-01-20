@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.UUID;
 
 @Component
 @ParametersAreNonnullByDefault

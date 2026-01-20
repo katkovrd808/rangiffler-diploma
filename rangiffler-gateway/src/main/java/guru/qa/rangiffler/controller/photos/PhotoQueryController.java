@@ -30,8 +30,7 @@ public class PhotoQueryController {
 
   @QueryMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  FeedGql feed(@AuthenticationPrincipal Jwt principal,
+  public @Nonnull FeedGql feed(@AuthenticationPrincipal Jwt principal,
                @Argument int page,
                @Argument int size,
                @Argument boolean withFriends) {

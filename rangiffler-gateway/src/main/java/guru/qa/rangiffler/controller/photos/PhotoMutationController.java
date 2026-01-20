@@ -31,11 +31,9 @@ public class PhotoMutationController {
     this.photoService = photoService;
   }
 
-  //TODO добавить валидацию
   @MutationMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  PhotoGql photo(@AuthenticationPrincipal Jwt principal,
+  public @Nonnull PhotoGql photo(@AuthenticationPrincipal Jwt principal,
                  @Argument @Valid PhotoInputGql input) {
     final String principalUsername = principal.getClaim("sub");
 
@@ -54,8 +52,7 @@ public class PhotoMutationController {
 
   @MutationMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  String deletePhoto(@AuthenticationPrincipal Jwt principal,
+  public @Nonnull String deletePhoto(@AuthenticationPrincipal Jwt principal,
                      @Argument String id) {
     final String principalUsername = principal.getClaim("sub");
     return photoService.delete(principalUsername, id);

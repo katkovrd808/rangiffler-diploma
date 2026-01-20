@@ -4,7 +4,6 @@ import guru.qa.rangiffler.model.graphql.userdata.UserGql;
 import guru.qa.rangiffler.model.graphql.userdata.UserInputGql;
 import guru.qa.rangiffler.model.graphql.userdata.UsersSliceGql;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

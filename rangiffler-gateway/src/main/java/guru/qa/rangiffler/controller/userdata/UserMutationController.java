@@ -4,6 +4,7 @@ import guru.qa.rangiffler.model.graphql.userdata.FriendshipInputGql;
 import guru.qa.rangiffler.model.graphql.userdata.UserGql;
 import guru.qa.rangiffler.model.graphql.userdata.UserInputGql;
 import guru.qa.rangiffler.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -29,22 +30,18 @@ public class UserMutationController {
     this.userService = userService;
   }
 
-  //TODO добавить валидацию
   @MutationMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  UserGql user(@AuthenticationPrincipal Jwt principal,
-               @Argument UserInputGql input) {
+  public @Nonnull UserGql user(@AuthenticationPrincipal Jwt principal,
+               @Argument @Valid UserInputGql input) {
     final String principalUsername = principal.getClaim("sub");
     return userService.updateUser(principalUsername, input);
   }
 
-  //TODO добавить валидацию
   @MutationMapping
   @ResponseStatus(HttpStatus.OK)
-  @Nonnull
-  UserGql friendship(@AuthenticationPrincipal Jwt principal,
-                     @Argument FriendshipInputGql input) {
+  public @Nonnull UserGql friendship(@AuthenticationPrincipal Jwt principal,
+                     @Argument @Valid FriendshipInputGql input) {
     final String principalUsername = principal.getClaim("sub");
     final String targetUsername = userService.findUser(null, input.user()).username();
     return userService.friendship(principalUsername, targetUsername, input.action());

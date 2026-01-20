@@ -7,6 +7,7 @@ import guru.qa.rangiffler.service.mapper.FriendshipMapper;
 import guru.qa.rangiffler.service.mapper.UserMapper;
 import guru.qa.rangiffler.service.utils.GrpcExceptionHandler;
 import io.grpc.StatusRuntimeException;
+import jakarta.validation.constraints.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;

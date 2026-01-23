@@ -24,7 +24,6 @@ dependencies {
     //KAFKA
     implementation "org.springframework.kafka:spring-kafka:${project.ext.springKafkaVersion}"
     //UTIL
-    implementation "net.coobird:thumbnailator:${project.ext.thumbnailatorVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
     implementation "org.mapstruct:mapstruct:${project.ext.mapStructVersion}"
     annotationProcessor "org.projectlombok:lombok:${project.ext.lombokVersion}"

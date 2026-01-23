@@ -22,7 +22,6 @@ dependencies {
     runtimeOnly "org.postgresql:postgresql:${project.ext.postgresDriverVersion}"
     testImplementation "com.h2database:h2:${project.ext.h2Version}"
     //UTIL
-    implementation "net.coobird:thumbnailator:${project.ext.thumbnailatorVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${project.ext.mapStructVersion}"
     implementation "org.mapstruct:mapstruct:${project.ext.mapStructVersion}"
     annotationProcessor "org.projectlombok:lombok:${project.ext.lombokVersion}"

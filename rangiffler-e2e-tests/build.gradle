@@ -1,0 +1,132 @@
+buildscript {
+    ext {
+        junitVersion = '5.13.1'
+        allureVersion = '2.29.0'
+        selenideVersion = '7.9.3'
+        okhttp3Version = '4.12.0'
+        retrofitVersion = '2.11.0'
+        logbackVersion = '1.4.11'
+        slf4jVersion = '2.0.9'
+        springCryptoVersion = '6.4.5'
+        p6spyVersion = '3.9.1'
+        hibernateVersion = '6.6.13.Final'
+        kafkaClientsVersion = '4.0.0'
+        saajVersion = '3.0.4'
+        springDataCommonsVersion = '3.4.4'
+        atomikosVersion = '6.0.0'
+        wiremockVersion = '3.12.1'
+        fakerVersion = '1.0.2'
+        ashotVersion = '1.5.4'
+        pioneerVersion = '2.3.0'
+    }
+}
+
+plugins {
+    id 'io.qameta.allure' version '2.12.0'
+    id 'io.qameta.allure-adapter' version '2.12.0'
+    id 'com.github.edeandrea.xjc-generation' version '1.6'
+}
+
+group = 'guru.qa'
+version = '0.0.1'
+
+allure {
+    version.set("${allureVersion}")
+    adapter {
+        aspectjVersion.set("1.9.22")
+        aspectjWeaver.set(true)
+    }
+}
+
+xjcGeneration {
+    defaultAdditionalXjcOptions = ['encoding': 'UTF-8']
+    schemas {
+        wsdlSchema {
+            schemaFile = 'userdata.wsdl'
+            javaPackageName = 'jaxb.userdata'
+            sourceSet = 'test'
+        }
+    }
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir('src/test/java')
+            srcDir("$buildDir/generated-sources/test/xjc")
+        }
+    }
+}
+
+dependencies {
+    // Logs
+    testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
+    testImplementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    // JUnit
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+    testImplementation "org.junit-pioneer:junit-pioneer:${pioneerVersion}"
+    // REST
+    testImplementation "com.squareup.okhttp3:logging-interceptor:${okhttp3Version}"
+    testImplementation "com.squareup.okhttp3:okhttp-urlconnection:${okhttp3Version}"
+    testImplementation "com.squareup.okhttp3:okhttp:${okhttp3Version}"
+    testImplementation("com.squareup.retrofit2:retrofit:${retrofitVersion}") {
+        exclude group: "com.squareup.okhttp3"
+    }
+    testImplementation("com.squareup.retrofit2:converter-jackson:${retrofitVersion}") {
+        exclude group: "com.squareup.okhttp3"
+    }
+    testImplementation "org.springframework.data:spring-data-commons:${springDataCommonsVersion}"
+    // DB
+    testImplementation "org.postgresql:postgresql:${project.ext.postgresDriverVersion}"
+    testImplementation "p6spy:p6spy:${p6spyVersion}"
+    testImplementation "org.hibernate:hibernate-core:${hibernateVersion}"
+    testImplementation "org.springframework.security:spring-security-crypto:${springCryptoVersion}"
+    testImplementation "com.atomikos:transactions-jta:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-hibernate4:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-jdbc:6.0.0"
+    // Allure
+    testImplementation "io.qameta.allure:allure-attachments:${allureVersion}"
+    testImplementation("io.qameta.allure:allure-junit5:${allureVersion}") {
+        exclude group: "org.junit.jupiter"
+    }
+    testImplementation("io.qameta.allure:allure-selenide:${allureVersion}") {
+        exclude group: 'com.codeborne'
+    }
+    testImplementation "io.qameta.allure:allure-okhttp3:${allureVersion}"
+    testImplementation "io.qameta.allure:allure-grpc:${allureVersion}"
+    // WEB
+    testImplementation "com.codeborne:selenide:${selenideVersion}"
+    // Utils
+    testImplementation "ru.yandex.qatools.ashot:ashot:${ashotVersion}"
+    testImplementation("com.github.javafaker:javafaker:${fakerVersion}") {
+        exclude group: 'org.yaml'
+    }
+    testImplementation 'commons-io:commons-io:2.19.0'
+    testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+    testImplementation 'com.github.vertical-blank:sql-formatter:2.0.5'
+    testImplementation 'com.github.h-thurow:simple-jndi:0.24.0'
+    // gRPC
+    testImplementation "io.grpc:grpc-api:${project.ext.grpcVersion}"
+    testImplementation "io.grpc:grpc-stub:${project.ext.grpcVersion}"
+    testImplementation "io.grpc:grpc-netty-shaded:${project.ext.grpcVersion}"
+    testImplementation "com.google.protobuf:protobuf-java:${project.ext.protobufVersion}"
+    testImplementation "com.google.protobuf:protobuf-java-util:${project.ext.protobufVersion}"
+    testImplementation project(':rangiffler-grpc-common')
+    // Kafka
+    testImplementation "org.apache.kafka:kafka-clients:${kafkaClientsVersion}"
+    // Wiremock
+    testImplementation "org.wiremock:wiremock:${project.ext.wiremockVersion}"
+    // Lombok
+    testAnnotationProcessor "org.projectlombok:lombok:${project.ext.lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${project.ext.lombokVersion}"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.register('printVersion') {
+    doLast {
+        println project.version
+    }
+}

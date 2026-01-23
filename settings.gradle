@@ -5,3 +5,5 @@ include 'rangiffler-countries'
 include 'rangiffler-photos'
 include 'rangiffler-userdata'
 include 'rangiffler-grpc-common'
+include 'rangiffler-e2e-tests'
+

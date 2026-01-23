@@ -1,5 +1,5 @@
-export const MAX_PHOTO_DESCRIPTION_LENGTH = 255;
-export const MAX_PHOTO_DESCRIPTION_ERROR = "Description length has to be not longer that 255 symbols";
+export const MAX_PHOTO_DESCRIPTION_LENGTH = 50;
+export const MAX_PHOTO_DESCRIPTION_ERROR = "Description length has to be not longer that 50 symbols";
 export const EMPTY_SRC_ERROR = "Please upload an image";
 export const EMPTY_COUNTRY_ERROR = "You have to select country";
 

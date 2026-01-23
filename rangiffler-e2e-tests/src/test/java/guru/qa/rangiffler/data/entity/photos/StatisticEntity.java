@@ -1,6 +1,5 @@
 package guru.qa.rangiffler.data.entity.photos;
 
-import guru.qa.rangiffler.data.StatisticId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

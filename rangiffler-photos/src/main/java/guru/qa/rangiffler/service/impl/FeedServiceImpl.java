@@ -8,7 +8,6 @@ import guru.qa.rangiffler.service.FeedService;
 import guru.qa.rangiffler.service.PhotoService;
 import guru.qa.rangiffler.service.StatisticService;
 import guru.qa.rangiffler.service.mapper.FeedMapper;
-import guru.qa.rangiffler.service.utils.PhotoCompressor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

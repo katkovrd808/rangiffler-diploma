@@ -13,6 +13,7 @@ import guru.qa.rangiffler.data.repository.impl.UserdataUserRepositoryHibernate;
 import guru.qa.rangiffler.data.tpl.XaTransactionTemplate;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.service.UsersClient;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -27,6 +28,8 @@ public class UsersDbClient implements UsersClient {
 
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+  private static final String DEFAULT_COUNTRY_ID = "9415a235-6d91-484e-a92a-afa68c55bcb2";
 
   private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
   private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositoryHibernate();
@@ -80,6 +83,7 @@ public class UsersDbClient implements UsersClient {
     return UdUserJson.fromEntity(userdataUserRepository.update(ue), null);
   }
 
+  //TODO пофиксить инвайты в друзья: все инвайты улетают в Income
   @Nonnull
   @Override
   public List<UdUserJson> addInvitation(UdUserJson targetUser, int count) {
@@ -91,13 +95,13 @@ public class UsersDbClient implements UsersClient {
 
       for (int i = 0; i < count; i++) {
         xaTransactionTemplate.execute(() -> {
-            String username = randomUsername();
-            AuthUserEntity authUser = authUserEntity(username, "12345");
+            final String username = randomUsername();
+            final AuthUserEntity authUser = authUserEntity(username, "12345");
             authUserRepository.create(authUser);
-            UdUserEntity adressee = userdataUserRepository.create(userEntity(username));
-            userdataUserRepository.sendInvitation(targetEntity, adressee);
+            final UdUserEntity addressee = userdataUserRepository.create(userEntity(username));
+            userdataUserRepository.sendInvitation(targetEntity, addressee);
             result.add(UdUserJson.fromEntity(
-              adressee,
+              addressee,
               FriendshipStatus.PENDING
             ));
             return null;
@@ -149,7 +153,7 @@ public class UsersDbClient implements UsersClient {
   private UdUserEntity userEntity(String username) {
     UdUserEntity ue = new UdUserEntity();
     ue.setUsername(username);
-    ue.setCurrency(CurrencyValues.RUB);
+    ue.setCountryId(UUID.fromString(DEFAULT_COUNTRY_ID));
     return ue;
   }
 

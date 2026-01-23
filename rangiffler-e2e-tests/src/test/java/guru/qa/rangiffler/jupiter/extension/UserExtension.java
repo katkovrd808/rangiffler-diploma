@@ -7,8 +7,8 @@ import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.service.PhotoClient;
 import guru.qa.rangiffler.service.UserdataClient;
 import guru.qa.rangiffler.service.UsersClient;
-import guru.qa.rangiffler.service.impl.api.PhotoApiClient;
 import guru.qa.rangiffler.service.impl.api.UserdataApiClient;
+import guru.qa.rangiffler.service.impl.db.PhotoDbClient;
 import guru.qa.rangiffler.service.impl.db.UsersDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -16,7 +16,6 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-import static guru.qa.rangiffler.jupiter.extension.TestMethodContextExtension.context;
 import static guru.qa.rangiffler.utils.RandomDataUtils.randomUsername;
 
 public class UserExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
@@ -26,7 +25,7 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
 
   private final UsersClient usersClient = new UsersDbClient();
   private final UserdataClient userdataClient = new UserdataApiClient();
-  private final PhotoClient photoClient = new PhotoApiClient();
+  private final PhotoClient photoClient = new PhotoDbClient();
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -44,7 +43,8 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
         final List<PhotoWithLikes> photos = new ArrayList<>();
 
         if (user.username().equals(userAnno.username())) {
-          photos.addAll(photoClient.findUserPhotos(user.username()));
+          //TODO добавить получение фото пользователя
+          //photos.addAll(photoClient.findUserPhotos(user.username()));
 
           incomes.addAll(userdataClient.findIncomeInvitations(user.username()));
           outcomes.addAll(userdataClient.findOutcomeInvitations(user.username()));
@@ -81,7 +81,7 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
   }
 
   public static void setUser(UdUserJson testUser) {
-    final ExtensionContext context = context();
+    final ExtensionContext context = TestMethodContextExtension.context();
     context.getStore(NAMESPACE).put(
       context.getUniqueId(),
       testUser
@@ -89,7 +89,7 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
   }
 
   public static UdUserJson createdUser() {
-    final ExtensionContext methodContext = context();
+    final ExtensionContext methodContext = TestMethodContextExtension.context();
     return methodContext.getStore(NAMESPACE)
       .get(methodContext.getUniqueId(), UdUserJson.class);
   }

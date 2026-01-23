@@ -1,2 +1,2 @@
+guru.qa.rangiffler.jupiter.extension.TestMethodContextExtension
 guru.qa.rangiffler.jupiter.extension.DatabasesExtension
-guru.qa.rangiffler.jupiter.extension.AllureBackendLogExtension

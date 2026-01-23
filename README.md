@@ -15,6 +15,23 @@
 
 <img src="services.png" width="600">
 
+## Стэк проекта
+- Java 21
+- JUnit 5 (Extensions, Resolvers, etc)
+- PostgreSQL
+- Selenide
+- Gradle
+- Spring Authorization Server
+- Spring OAuth 2.0 Resource Server
+- Spring Data JPA
+- Spring Web
+- Spring Actuator
+- Spring gRPC
+- Spring GraphQL
+- Apache Kafka
+- Docker
+- Docker-compose
+
 # Локальный запуск приложения
 Для корректной локальной работы сервиса первоначально необходимо установить Docker Images. Сделать это можно с помощью следующих команд:
 ```posh

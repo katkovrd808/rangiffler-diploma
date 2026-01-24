@@ -1,6 +1,5 @@
 package guru.qa.rangiffler.grpc;
 
-import com.google.protobuf.Empty;
 import guru.qa.rangiffler.service.PhotoLikeService;
 import guru.qa.rangiffler.service.PhotoService;
 import guru.qa.rangiffler.service.impl.FeedServiceImpl;

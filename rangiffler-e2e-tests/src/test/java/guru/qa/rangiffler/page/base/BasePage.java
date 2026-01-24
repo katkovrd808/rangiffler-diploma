@@ -11,7 +11,9 @@ import static com.codeborne.selenide.Selenide.$;
 public class BasePage <T extends BasePage<?>>{
 
   protected final SideBarElement sideBar = new SideBarElement();
-  protected final SelenideElement alert = $("#root [role='presentation']");
+  protected final SelenideElement
+    alert = $("#root div[role='alert']"),
+    title = $("#root h2");
 
   protected static final Config CFG = Config.getInstance();
 

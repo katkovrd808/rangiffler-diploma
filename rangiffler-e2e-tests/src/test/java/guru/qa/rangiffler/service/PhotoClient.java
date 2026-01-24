@@ -1,11 +1,21 @@
 package guru.qa.rangiffler.service;
 
-import guru.qa.rangiffler.data.projection.PhotoWithLikes;
+import guru.qa.rangiffler.grpc.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 public interface PhotoClient {
-  List<PhotoWithLikes> findUserPhotos(String username);
+  @Nonnull PhotoResponse create(PhotoRequest request);
+
+  @Nonnull PhotoResponse update(PhotoUpdateRequest request);
+
+  @Nonnull PhotoDeleteResponse delete(PhotoDeleteRequest request);
+
+  @Nonnull PhotoResponse likePhoto(PhotoLikeRequest request);
+
+  @Nonnull PhotoResponse deletePhotoLike(PhotoLikeRequest request);
+
+  @Nonnull FeedResponse feed(FeedRequest request);
 }

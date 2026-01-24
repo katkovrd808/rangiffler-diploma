@@ -1,7 +1,6 @@
 package guru.qa.rangiffler.page;
 
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.rangiffler.config.Config;
 import io.qameta.allure.Step;
 
 import javax.annotation.Nonnull;
@@ -20,10 +19,6 @@ public class LoginPage {
     loginForm = $(".main__form form"),
     registrationButton = $(".main__form form a"),
     formError = $(".form__error");
-
-  private final static Config CFG = Config.getInstance();
-
-  public final static String URL = CFG.authUrl() + "login";
 
   @Nonnull
   @Step("Logging in user profile")
@@ -68,8 +63,8 @@ public class LoginPage {
 
   @Nonnull
   @Step("Logging in")
-  public MainPage submit() {
+  public PhotoPage submit() {
     submitButton.click();
-    return new MainPage();
+    return new PhotoPage();
   }
 }

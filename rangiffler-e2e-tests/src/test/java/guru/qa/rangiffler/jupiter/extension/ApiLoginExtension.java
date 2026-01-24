@@ -8,7 +8,7 @@ import guru.qa.rangiffler.jupiter.annotation.ApiLogin;
 import guru.qa.rangiffler.jupiter.annotation.Token;
 import guru.qa.rangiffler.model.TestData;
 import guru.qa.rangiffler.model.UdUserJson;
-import guru.qa.rangiffler.page.MainPage;
+import guru.qa.rangiffler.page.PhotoPage;
 import guru.qa.rangiffler.service.impl.api.AuthApiClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -71,7 +71,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
           WebDriverRunner.getWebDriver().manage().addCookie(
             getJsessionIdCookie()
           );
-          Selenide.open(MainPage.URL, MainPage.class).checkThatPageLoaded();
+          Selenide.open(PhotoPage.URL, PhotoPage.class).checkThatPageLoaded();
         }
       });
   }

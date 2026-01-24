@@ -13,7 +13,6 @@ import static com.codeborne.selenide.Selenide.$;
 @ParametersAreNonnullByDefault
 public class WelcomePage extends BasePage<WelcomePage> {
   private final SelenideElement
-    title = $("#root h2"),
     loginBtn = $("#root button"),
     registrationBtn = $("#root a");
 

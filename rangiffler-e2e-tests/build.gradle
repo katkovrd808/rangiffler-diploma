@@ -106,12 +106,9 @@ dependencies {
     testImplementation 'com.github.vertical-blank:sql-formatter:2.0.5'
     testImplementation 'com.github.h-thurow:simple-jndi:0.24.0'
     // gRPC
-    testImplementation "io.grpc:grpc-api:${project.ext.grpcVersion}"
-    testImplementation "io.grpc:grpc-stub:${project.ext.grpcVersion}"
-    testImplementation "io.grpc:grpc-netty-shaded:${project.ext.grpcVersion}"
-    testImplementation "com.google.protobuf:protobuf-java:${project.ext.protobufVersion}"
-    testImplementation "com.google.protobuf:protobuf-java-util:${project.ext.protobufVersion}"
     testImplementation project(':rangiffler-grpc-common')
+
+    testImplementation 'org.springframework.grpc:spring-grpc-client-spring-boot-starter'
     // Kafka
     testImplementation "org.apache.kafka:kafka-clients:${kafkaClientsVersion}"
     // Wiremock

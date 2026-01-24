@@ -1,14 +1,16 @@
 package guru.qa.rangiffler.jupiter.extension;
 
 import guru.qa.rangiffler.data.projection.PhotoWithLikes;
+import guru.qa.rangiffler.grpc.FeedRequest;
+import guru.qa.rangiffler.grpc.PaginationRequest;
 import guru.qa.rangiffler.jupiter.annotation.User;
 import guru.qa.rangiffler.model.TestData;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.service.PhotoClient;
 import guru.qa.rangiffler.service.UserdataClient;
 import guru.qa.rangiffler.service.UsersClient;
-import guru.qa.rangiffler.service.impl.api.UserdataApiClient;
-import guru.qa.rangiffler.service.impl.db.PhotoDbClient;
+import guru.qa.rangiffler.service.impl.api.PhotoGrpcClient;
+import guru.qa.rangiffler.service.impl.api.UserdataGrpcClient;
 import guru.qa.rangiffler.service.impl.db.UsersDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -24,8 +26,8 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
   public static final String DEFAULT_PASSWORD = "secret";
 
   private final UsersClient usersClient = new UsersDbClient();
-  private final UserdataClient userdataClient = new UserdataApiClient();
-  private final PhotoClient photoClient = new PhotoDbClient();
+  private final UserdataClient userdataClient = new UserdataGrpcClient();
+  private final PhotoClient photoClient = new PhotoGrpcClient();
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -40,15 +42,27 @@ public class UserExtension implements BeforeEachCallback, AfterTestExecutionCall
         final List<UdUserJson> outcomes = usersClient.addInvitation(user, userAnno.outcomeInvitations());
         final List<UdUserJson> friends = usersClient.addFriend(user, userAnno.friends());
 
-        final List<PhotoWithLikes> photos = new ArrayList<>();
+        List<PhotoWithLikes> photos = new ArrayList<>();
 
         if (user.username().equals(userAnno.username())) {
-          //TODO добавить получение фото пользователя
-          //photos.addAll(photoClient.findUserPhotos(user.username()));
+          photos = photoClient.feed(FeedRequest.newBuilder()
+              .setUserId(user.id().toString())
+              .setWithFriends(false)
+              .setPaginationRequest(
+                PaginationRequest.newBuilder()
+                  .setPage(0)
+                  .setSize(50)
+                  .build()
+              )
+              .build()
+            ).getPhotos().getPhotosList()
+            .stream()
+            .map(PhotoWithLikes::fromProto)
+            .toList();
 
-          incomes.addAll(userdataClient.findIncomeInvitations(user.username()));
-          outcomes.addAll(userdataClient.findOutcomeInvitations(user.username()));
-          friends.addAll(userdataClient.findAllFriends(user.username(), null));
+          incomes.addAll(userdataClient.findIncomeInvitations(user.username(), null));
+          outcomes.addAll(userdataClient.findOutcomeInvitations(user.username(), null));
+          friends.addAll(userdataClient.findAllFriends(user.username()));
         }
 
         TestData testData = new TestData(

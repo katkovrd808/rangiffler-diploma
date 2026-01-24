@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import guru.qa.rangiffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.rangiffler.data.entity.userdata.UdUserEntity;
+import guru.qa.rangiffler.grpc.Friend;
+import guru.qa.rangiffler.grpc.UserResponse;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,6 +44,32 @@ public record UdUserJson(
             entity.getPhoto() != null && entity.getPhoto().length > 0 ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null,
             friendshipStatus,
             null
+    );
+  }
+
+  @Nonnull
+  public static UdUserJson fromProto(UserResponse user) {
+    return new UdUserJson(
+      UUID.fromString(user.getId()),
+      user.getUsername(),
+      user.getFirstname(),
+      user.getSurname(),
+      user.getPhoto() != null ? user.getPhoto().toString() : null,
+      null,
+      null
+    );
+  }
+
+  @Nonnull
+  public static UdUserJson fromProto(Friend user) {
+    return new UdUserJson(
+      UUID.fromString(user.getId()),
+      user.getUsername(),
+      user.getFirstname(),
+      user.getSurname(),
+      user.getPhoto() != null ? user.getPhoto().toString() : null,
+      null,
+      null
     );
   }
 

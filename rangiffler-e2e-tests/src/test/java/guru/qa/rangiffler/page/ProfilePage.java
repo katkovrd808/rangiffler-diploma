@@ -18,10 +18,7 @@ public class ProfilePage extends BasePage<ProfilePage> {
 
   public final static String URL = CFG.frontUrl() + "profile";
 
-  //#root label[for='image__input']
-
   private final SelenideElement
-    title = $("#root h2"),
     firstnameInput = $("#firstname"),
     surnameInput = $("#surname"),
     usernameInput = $("#username"),

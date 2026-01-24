@@ -33,6 +33,11 @@ public class RandomDataUtils {
   }
 
   @Nonnull
+  public static String randomLongPhotoDescription() {
+    return faker.lorem().sentence(15);
+  }
+
+  @Nonnull
   public static String randomSentence(int wordsCount) {
     return faker.lorem().sentence(wordsCount);
   }

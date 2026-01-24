@@ -3,7 +3,6 @@ package guru.qa.rangiffler.test.web;
 import guru.qa.rangiffler.config.Config;
 import guru.qa.rangiffler.jupiter.annotation.User;
 import guru.qa.rangiffler.model.UdUserJson;
-import guru.qa.rangiffler.page.LoginPage;
 import guru.qa.rangiffler.page.WelcomePage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -36,7 +35,8 @@ public class LoginTest {
   @Test
   @DisplayName("Unregistered user should get error when trying to login")
   void errorShouldBeShownIfUserNotRegistered(){
-    open(FRONT_URL, LoginPage.class)
+    open(FRONT_URL, WelcomePage.class)
+      .openLoginPage()
       .fillLoginPage(randomUsername(), "12345")
       .submitAndCheckErrorText(CREDENTIALS_ERROR_TEXT);
   }

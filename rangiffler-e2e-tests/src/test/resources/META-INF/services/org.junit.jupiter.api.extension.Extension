@@ -1,2 +1,3 @@
+guru.qa.rangiffler.jupiter.extension.CookieStoreExtension
 guru.qa.rangiffler.jupiter.extension.TestMethodContextExtension
 guru.qa.rangiffler.jupiter.extension.DatabasesExtension

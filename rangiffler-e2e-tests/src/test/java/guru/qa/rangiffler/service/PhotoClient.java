@@ -13,9 +13,5 @@ public interface PhotoClient {
 
   @Nonnull PhotoDeleteResponse delete(PhotoDeleteRequest request);
 
-  @Nonnull PhotoResponse likePhoto(PhotoLikeRequest request);
-
-  @Nonnull PhotoResponse deletePhotoLike(PhotoLikeRequest request);
-
   @Nonnull FeedResponse feed(FeedRequest request);
 }

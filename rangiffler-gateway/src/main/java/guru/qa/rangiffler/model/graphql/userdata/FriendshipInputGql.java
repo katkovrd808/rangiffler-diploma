@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record FriendshipInputGql(
-  @NotBlank(message = "User id can't be blank")
   UUID user,
   FriendshipAction action
 ) {

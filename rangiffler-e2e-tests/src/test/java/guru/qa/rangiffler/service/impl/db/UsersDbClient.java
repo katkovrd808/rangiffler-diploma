@@ -13,7 +13,6 @@ import guru.qa.rangiffler.data.repository.impl.UserdataUserRepositoryHibernate;
 import guru.qa.rangiffler.data.tpl.XaTransactionTemplate;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.service.UsersClient;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -83,7 +82,6 @@ public class UsersDbClient implements UsersClient {
     return UdUserJson.fromEntity(userdataUserRepository.update(ue), null);
   }
 
-  //TODO пофиксить инвайты в друзья: все инвайты улетают в Income
   @Nonnull
   @Override
   public List<UdUserJson> addInvitation(UdUserJson targetUser, int count) {

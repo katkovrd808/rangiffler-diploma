@@ -10,11 +10,6 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public interface UsersClient {
-    //TODO ADD FACTORY LOGIC WHEN DOCKER WILL BE SET UP
-    /*static UsersClient getInstance() {
-        return new UsersDbClient();
-    }*/
-
     @Nonnull
     UdUserJson create(String username, String password);
 

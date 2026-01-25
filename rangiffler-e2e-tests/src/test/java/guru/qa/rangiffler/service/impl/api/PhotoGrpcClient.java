@@ -49,19 +49,7 @@ public class PhotoGrpcClient implements PhotoClient {
 
   @NotNull
   @Override
-  public PhotoResponse likePhoto(PhotoLikeRequest request) {
-    return null;
-  }
-
-  @NotNull
-  @Override
-  public PhotoResponse deletePhotoLike(PhotoLikeRequest request) {
-    return null;
-  }
-
-  @NotNull
-  @Override
   public FeedResponse feed(FeedRequest request) {
-    return null;
+    return blockingStub.getUserFeed(request);
   }
 }

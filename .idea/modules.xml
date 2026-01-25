@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/rangiffler-diploma.iml" filepath="$PROJECT_DIR$/.idea/rangiffler-diploma.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-e2e-tests/rangiffler-diploma.rangiffler-e2e-tests.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-e2e-tests/rangiffler-diploma.rangiffler-e2e-tests.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.test.iml" />

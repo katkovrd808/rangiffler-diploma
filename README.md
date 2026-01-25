@@ -82,3 +82,7 @@ b4759db53249   confluentinc/cp-kafka:7.3.2       "/etc/confluent/dock…"   19 m
 5579fa1f58f5   confluentinc/cp-zookeeper:7.3.2   "/etc/confluent/dock…"   19 minutes ago   Up 19 minutes   2888/tcp, 0.0.0.0:2181->2181/tcp, 3888/tcp   zookeeper
 e9fd38df2c3c   postgres:15.1                     "docker-entrypoint.s…"   19 minutes ago   Up 19 minutes   0.0.0.0:5432->5432/tcp                       rangiffler-all
 ```
+
+# Результаты тестирования
+
+<img src="test-results.png" width="600">

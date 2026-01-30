@@ -12,6 +12,9 @@ spring:
       - 'org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration'
 
   grpc:
+    client:
+      default-channel:
+        negotiation-type: PLAINTEXT
     server:
       port: 9093
       servlet:
@@ -78,14 +81,6 @@ spring:
   config:
     activate:
       on-profile: 'docker'
-  grpc:
-    client:
-      countries-service:
-        address: 'countries.rangiffler.dc:9090'
-        negotiationType: PLAINTEXT
-      userdata-service:
-        address: 'userdata.rangiffler.dc:9091'
-        negotiationType: PLAINTEXT
   datasource:
     url: 'jdbc:postgresql://rangiffler-all-db:5432/rangiffler-photos'
     username: postgres

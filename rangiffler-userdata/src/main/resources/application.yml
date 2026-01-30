@@ -12,6 +12,9 @@ spring:
       - 'org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration'
 
   grpc:
+    client:
+      default-channel:
+        negotiation-type: PLAINTEXT
     server:
       port: 9091
       servlet:
@@ -83,11 +86,6 @@ spring:
   config:
     activate:
       on-profile: 'docker'
-  grpc:
-    client:
-      countries-service:
-        address: 'countries.rangiffler.dc:9090'
-        negotiationType: PLAINTEXT
   kafka:
     bootstrap-servers: 'kafka:9092'
     consumer:

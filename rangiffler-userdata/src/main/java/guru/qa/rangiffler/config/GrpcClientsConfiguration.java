@@ -1,8 +1,6 @@
 package guru.qa.rangiffler.config;
 
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
-import guru.qa.rangiffler.grpc.RangifflerPhotosServiceGrpc;
-import guru.qa.rangiffler.grpc.RangifflerUserdataServiceGrpc;
 import io.grpc.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -16,17 +14,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Configuration
 @ParametersAreNonnullByDefault
 public class GrpcClientsConfiguration {
-
-  @Bean
-  @Profile("local")
-  public RangifflerPhotosServiceGrpc.RangifflerPhotosServiceBlockingStub rangifflerPhotosServiceBlockingStub(
-    GrpcChannelFactory grpcChannelFactory
-  ) {
-    Channel channel = grpcChannelFactory.createChannel("photos-service");
-    return RangifflerPhotosServiceGrpc.newBlockingStub(channel)
-      .withMaxInboundMessageSize(1024 * 1024);
-  }
-
   @Bean
   @Profile("local")
   public RangifflerCountriesServiceGrpc.RangifflerCountriesServiceBlockingStub rangifflerCountriesServiceBlockingStub(
@@ -34,16 +21,6 @@ public class GrpcClientsConfiguration {
   ) {
     Channel channel = grpcChannelFactory.createChannel("countries-service");
     return RangifflerCountriesServiceGrpc.newBlockingStub(channel)
-      .withMaxInboundMessageSize(1024 * 1024);
-  }
-
-  @Bean
-  @Profile("local")
-  public RangifflerUserdataServiceGrpc.RangifflerUserdataServiceBlockingStub rangifflerUserdataServiceBlockingStub(
-    GrpcChannelFactory grpcChannelFactory
-  ) {
-    Channel channel = grpcChannelFactory.createChannel("userdata-service");
-    return RangifflerUserdataServiceGrpc.newBlockingStub(channel)
       .withMaxInboundMessageSize(1024 * 1024);
   }
 }

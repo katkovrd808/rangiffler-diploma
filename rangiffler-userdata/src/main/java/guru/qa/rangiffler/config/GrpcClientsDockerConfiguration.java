@@ -1,7 +1,8 @@
 package guru.qa.rangiffler.config;
 
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +14,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Slf4j
 @Configuration
 @ParametersAreNonnullByDefault
-@Profile({"local", "docker"})
-public class GrpcCountriesClientConfiguration {
+public class GrpcClientsDockerConfiguration {
   @Bean
-  public RangifflerCountriesServiceGrpc.RangifflerCountriesServiceBlockingStub rangifflerCountriesServiceBlockingStub(
+  @Profile("docker")
+  public RangifflerCountriesServiceGrpc.RangifflerCountriesServiceBlockingStub rangifflerCountriesServiceBlockingStubDocker(
     GrpcChannelFactory grpcChannelFactory
   ) {
-    Channel channel = grpcChannelFactory.createChannel("countries-service");
+    ManagedChannel channel = ManagedChannelBuilder
+      .forAddress("countries.rangiffler.dc", 9090)
+      .usePlaintext()
+      .build();
     return RangifflerCountriesServiceGrpc.newBlockingStub(channel)
       .withMaxInboundMessageSize(1024 * 1024);
   }

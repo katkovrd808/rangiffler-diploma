@@ -18,6 +18,9 @@ spring:
     static-path-pattern: "/resources/**"
 
   grpc:
+    client:
+      default-channel:
+        negotiation-type: PLAINTEXT
     server:
       enabled: false
 
@@ -80,17 +83,6 @@ spring:
   config:
     activate:
       on-profile: 'docker'
-  grpc:
-    client:
-      countries-service:
-        address: 'countries.rangiffler.dc:9090'
-        negotiationType: PLAINTEXT
-      userdata-service:
-        address: 'userdata.rangiffler.dc:9091'
-        negotiationType: PLAINTEXT
-      photos-service:
-        address: 'photos.rangiffler.dc:9093'
-        negotiationType: PLAINTEXT
   security:
     oauth2:
       resourceserver:

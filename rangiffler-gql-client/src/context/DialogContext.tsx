@@ -14,7 +14,7 @@ import DialogMui from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import {TransitionProps} from "@mui/material/transitions";
+import { TransitionProps } from "@mui/material/transitions";
 import Slide from "@mui/material/Slide";
 import {
     Box,
@@ -27,13 +27,13 @@ import {
     SelectChangeEvent,
     TextField
 } from "@mui/material";
-import {ImageUpload} from "../components/ImageUpload";
-import {formHasErrors, formInitialState, formValidate, PhotoFormProps} from "../components/PhotoModal/formValidate.ts";
-import {MenuProps} from "../components/CountrySelect";
-import {useCountries} from "./CountriesContext.tsx";
-import {useCreatePhoto} from "../hooks/useCreatePhoto.ts";
-import {useSnackBar} from "./SnackBarContext.tsx";
-import {useUpdatePhoto} from "../hooks/useUpdatePhoto.ts";
+import { ImageUpload } from "../components/ImageUpload";
+import { formHasErrors, formInitialState, formValidate, PhotoFormProps, isFormField } from "../components/PhotoModal/formValidate.ts";
+import { MenuProps } from "../components/CountrySelect";
+import { useCountries } from "./CountriesContext.tsx";
+import { useCreatePhoto } from "../hooks/useCreatePhoto.ts";
+import { useSnackBar } from "./SnackBarContext.tsx";
+import { useUpdatePhoto } from "../hooks/useUpdatePhoto.ts";
 
 const Transition = forwardRef(function Transition(
     props: TransitionProps & {
@@ -61,20 +61,20 @@ interface DialogContextProps {
     children: ReactNode;
 }
 
-const DialogProvider: FC<DialogContextProps> = ({children}) => {
+const DialogProvider: FC<DialogContextProps> = ({ children }) => {
     const [open, setOpen] = useState<boolean>(false);
     const [dialogData, setDialogData] = useState<DialogDataInterface>();
     const [formValues, setFormValues] = useState<PhotoFormProps>(formInitialState);
-    const {countries} = useCountries();
+    const { countries } = useCountries();
     const snackbar = useSnackBar();
 
-    const {createPhoto} = useCreatePhoto({
+    const { createPhoto } = useCreatePhoto({
         onError: () => snackbar.showSnackBar("Can not create new post", "error"),
         onCompleted: () => snackbar.showSnackBar("New post created", "success"),
-        withFriends: dialogData?.withFriends,
+        withFriends: dialogData?.withFriends ?? false,
     });
 
-    const {updatePhoto} = useUpdatePhoto({
+    const { updatePhoto } = useUpdatePhoto({
         onError: () => snackbar.showSnackBar("Can not update post", "error"),
         onCompleted: () => snackbar.showSnackBar("Post updated", "success"),
     });
@@ -134,29 +134,45 @@ const DialogProvider: FC<DialogContextProps> = ({children}) => {
     }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.target;
-        setFormValues({
-            ...formValues,
-            [name]: {
-                ...formValues[name],
-                value,
-            }
-        })
+        const { name, value } = event.target;
+        if (isFormField(name, formValues)) {
+            const fieldName = name as 'description' | 'country' | 'src';
+            setFormValues({
+                ...formValues,
+                [fieldName]: {
+                    ...formValues[fieldName],
+                    value,
+                }
+            });
+        } else if (name === 'id') {
+            setFormValues({
+                ...formValues,
+                [name]: value
+            });
+        }
     };
 
     const handleSelectValueChange = (event: SelectChangeEvent<string>) => {
-        const {name, value} = event.target;
-        setFormValues({
-            ...formValues,
-            [name]: {
-                ...formValues[name],
-                value,
-            }
-        })
+        const { name, value } = event.target;
+        if (isFormField(name, formValues)) {
+            const fieldName = name as 'description' | 'country' | 'src';
+            setFormValues({
+                ...formValues,
+                [fieldName]: {
+                    ...formValues[fieldName],
+                    value,
+                }
+            });
+        } else if (name === 'id') {
+            setFormValues({
+                ...formValues,
+                [name]: value
+            });
+        }
     };
 
     return (
-        <DialogContext.Provider value={{showDialog}}>
+        <DialogContext.Provider value={{ showDialog }}>
             {children}
             <DialogMui
                 open={open}
@@ -166,9 +182,9 @@ const DialogProvider: FC<DialogContextProps> = ({children}) => {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle>{dialogData?.title}</DialogTitle>
-                <DialogContent sx={{display: "flex", alignItems: "center"}}>
+                <DialogContent sx={{ display: "flex", alignItems: "center" }}>
                     <Grid container spacing={2} component="form" noValidate
-                          onSubmit={dialogData?.isEdit ? handleUpdate : handleCreate}>
+                        onSubmit={dialogData?.isEdit ? handleUpdate : handleCreate}>
                         <Grid item xs={12}>
                             <ImageUpload
                                 buttonText="Upload new image"
@@ -182,10 +198,10 @@ const DialogProvider: FC<DialogContextProps> = ({children}) => {
                                             value: file,
                                         }
                                     })
-                                }}/>
+                                }} />
                         </Grid>
                         <Grid item xs={12}>
-                            <FormControl sx={{width: "100%"}}>
+                            <FormControl sx={{ width: "100%" }}>
                                 <InputLabel id="select-country-label">Country</InputLabel>
                                 <Select
                                     id="country"
@@ -204,7 +220,7 @@ const DialogProvider: FC<DialogContextProps> = ({children}) => {
                                 >
                                     {countries.map((option) => (
                                         <MenuItem key={option.code} value={option.code}>
-                                            <img width={20} src={option.flag} alt={option.name}/>&nbsp;{option.name}
+                                            <img width={20} src={option.flag} alt={option.name} />&nbsp;{option.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -234,8 +250,8 @@ const DialogProvider: FC<DialogContextProps> = ({children}) => {
                                 justifyContent: "space-between",
                             }}
                         >
-                            <Button variant="contained" sx={{margin: 2}} type="submit">Save</Button>
-                            <Button sx={{margin: 2}} onClick={handleClose}>Close</Button>
+                            <Button variant="contained" sx={{ margin: 2 }} type="submit">Save</Button>
+                            <Button sx={{ margin: 2 }} onClick={handleClose}>Close</Button>
                         </Box>
                     </Grid>
                 </DialogContent>
@@ -254,4 +270,4 @@ const useDialog = (): DialogContextActions => {
     return context;
 };
 
-export {DialogProvider, useDialog};
+export { DialogProvider, useDialog };

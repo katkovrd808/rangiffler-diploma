@@ -41,6 +41,7 @@ public class GrpcCountriesClient {
     }
   }
 
+  @Nonnull
   public CountryDto getCountryById(UUID id) {
     try {
       CountryRequest request = countryMapper.toProtoRequest(null, id.toString());

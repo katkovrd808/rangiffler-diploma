@@ -4,11 +4,18 @@ import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
 import guru.qa.rangiffler.grpc.RangifflerPhotosServiceGrpc;
 import guru.qa.rangiffler.grpc.RangifflerUserdataServiceGrpc;
 import io.grpc.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@Slf4j
 @Configuration
+@ParametersAreNonnullByDefault
+@Profile({"local", "docker"})
 public class GrpcClientsConfiguration {
   @Bean
   public RangifflerPhotosServiceGrpc.RangifflerPhotosServiceBlockingStub rangifflerPhotosServiceBlockingStub(

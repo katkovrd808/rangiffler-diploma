@@ -4,22 +4,19 @@ server:
 spring:
   application:
     name: rangiffler-photos
+
+  autoconfigure:
+    exclude:
+      - 'org.springframework.cloud.vault.config.VaultAutoConfiguration'
+      - 'org.springframework.cloud.vault.config.VaultObservationAutoConfiguration'
+      - 'org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration'
+
   grpc:
     server:
       port: 9093
       servlet:
         enabled: false
-      security:
-        csrf:
-          enabled: false
-      max-inbound-message-size: 1048576
-      max-inbound-metadata-size: 32768
-    client:
-      channels:
-        countries-service:
-          address: 127.0.0.1:9090
-        userdata-service:
-          address: 127.0.0.1:9091
+
   logging:
     file:
       path: ./logs/rangiffler-photos
@@ -29,11 +26,9 @@ spring:
       org.springframework.security: INFO
       org.springframework.security.oauth2: INFO
       org.springframework.boot.autoconfigure: INFO
-      io.grpc: DEBUG
+      org.springframework.grpc: INFO
+
   datasource:
-    url: 'jdbc:postgresql://127.0.0.1:5432/rangiffler-photos'
-    username: postgres
-    password: secret
     hikari:
       connection-timeout: 20000
       minimum-idle: 10
@@ -41,12 +36,14 @@ spring:
       idle-timeout: 10000
       max-lifetime: 1000
       auto-commit: true
+
   flyway:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 0
     schemas: public
     locations: classpath:db/migration/rangiffler-photos
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -55,7 +52,41 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     generate-ddl: true
     open-in-view: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: 'local'
+  grpc:
+    client:
+      countries-service:
+        address: 'http://127.0.0.1:9090'
+        negotiationType: PLAINTEXT
+      userdata-service:
+        address: 'http://127.0.0.1:9091'
+        negotiationType: PLAINTEXT
+  datasource:
+    url: 'jdbc:postgresql://127.0.0.1:5432/rangiffler-photos'
+    username: postgres
+    password: secret
+---
+spring:
+  config:
+    activate:
+      on-profile: 'docker'
+  grpc:
+    client:
+      countries-service:
+        address: 'countries.rangiffler.dc:9090'
+        negotiationType: PLAINTEXT
+      userdata-service:
+        address: 'userdata.rangiffler.dc:9091'
+        negotiationType: PLAINTEXT
+  datasource:
+    url: 'jdbc:postgresql://rangiffler-all-db:5432/rangiffler-photos'
+    username: postgres
+    password: secret

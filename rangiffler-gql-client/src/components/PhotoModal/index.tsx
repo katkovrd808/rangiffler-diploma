@@ -1,8 +1,8 @@
 import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal as MuiModal,
     OutlinedInput, Select, SelectChangeEvent, TextField, Typography} from "@mui/material";
-import {ChangeEvent, FormEvent, FC, useState, useEffect} from "react";
+import {ChangeEvent, FormEvent, FC, useState, useEffect, ReactNode} from "react";
 import { ImageUpload } from "../ImageUpload";
-import { PhotoFormProps, formHasErrors, formInitialState, formValidate } from "./formValidate";
+import { PhotoFormProps, formHasErrors, formInitialState, formValidate, isFormField } from "./formValidate";
 import { useCountries } from "../../context/CountriesContext";
 import { useCreatePhoto } from "../../hooks/useCreatePhoto";
 import {useUpdatePhoto} from "../../hooks/useUpdatePhoto";
@@ -37,6 +37,7 @@ export const PhotoModal: FC<PhotoModalInterface> = ({modalState, onClose, isEdit
     const {createPhoto} = useCreatePhoto({
         onError: () => snackbar.showSnackBar("Can not create new post", "error"),
         onCompleted: () => snackbar.showSnackBar("New post created", "success"),
+        withFriends: false
     });
     const {updatePhoto} = useUpdatePhoto({
         onError: () => snackbar.showSnackBar("Can not update post", "error"),
@@ -50,30 +51,28 @@ export const PhotoModal: FC<PhotoModalInterface> = ({modalState, onClose, isEdit
     }, [modalState.formData]);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.target;
-        setFormValues({
-            ...formValues,
-            [name]: {
-                ...formValues[name],
-                value,
-            }
-        })
+        const { name, value } = event.target;
+
+        if (isFormField(name, formValues)) {
+            const fieldName = name as 'description' | 'country' | 'src';
+            setFormValues({
+                ...formValues,
+                [fieldName]: {
+                    ...formValues[fieldName],
+                    value,
+                }
+            });
+        } else if (name === 'id') {
+            setFormValues({
+                ...formValues,
+                [name]: value
+            });
+        }
     };
 
     const handleClose = () => {
         onClose();
         setFormValues(formInitialState);
-    };
-
-    const handleSelectValueChange = (event: SelectChangeEvent<string>) => {
-        const {name, value} = event.target;
-        setFormValues({
-            ...formValues,
-            [name]: {
-                ...formValues[name],
-                value,
-            }
-        })
     };
 
     const handleSubmit = (e: FormEvent) => {
@@ -89,7 +88,8 @@ export const PhotoModal: FC<PhotoModalInterface> = ({modalState, onClose, isEdit
                             description: formValues.description.value,
                             country: {
                                 code: formValues.country.value,
-                            }
+                            },
+                            src: formValues.src.value!!
                         }
                     }
                 });
@@ -111,6 +111,10 @@ export const PhotoModal: FC<PhotoModalInterface> = ({modalState, onClose, isEdit
 
         }
     };
+
+    function handleSelectValueChange(_event: SelectChangeEvent<string>, _child: ReactNode): void {
+        throw new Error("Function not implemented.");
+    }
 
     return (
         <MuiModal

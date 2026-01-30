@@ -3,27 +3,24 @@ server:
 spring:
   application:
     name: rangiffler-gateway
+
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.grpc.autoconfigure.server.security.GrpcSecurityAutoConfiguration
-      - org.springframework.grpc.autoconfigure.server.GrpcServerAutoConfiguration
+      - 'org.springframework.cloud.vault.config.VaultAutoConfiguration'
+      - 'org.springframework.cloud.vault.config.VaultObservationAutoConfiguration'
+      - 'org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration'
+      - 'org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration'
+      - 'org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration'
+      - 'org.springframework.grpc.autoconfigure.server.security.GrpcSecurityAutoConfiguration'
+      - 'org.springframework.grpc.autoconfigure.server.GrpcServerAutoConfiguration'
+
   mvc:
     static-path-pattern: "/resources/**"
+
   grpc:
     server:
       enabled: false
-      security:
-        enabled: false
-    client:
-      channels:
-        countries-service:
-          address: 127.0.0.1:9090
-        userdata-service:
-          address: 127.0.0.1:9091
-        photos-service:
-          address: 127.0.0.1:9093
+
   logging:
     file:
       path: ./logs/rangiffler-gateway
@@ -33,7 +30,8 @@ spring:
       org.springframework.security: INFO
       org.springframework.security.oauth2: INFO
       org.springframework.boot.autoconfigure: INFO
-      org.springframework.boot.graphql: INFO
+      org.springframework.grpc: INFO
+
   graphql:
     graphiql:
       enabled: false
@@ -42,11 +40,29 @@ spring:
     graphql:
       introspection: true
     exception-handling-enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: 'local'
+  grpc:
+    client:
+      countries-service:
+        address: '127.0.0.1:9090'
+        negotiationType: PLAINTEXT
+      userdata-service:
+        address: '127.0.0.1:9091'
+        negotiationType: PLAINTEXT
+      photos-service:
+        address: '127.0.0.1:9093'
+        negotiationType: PLAINTEXT
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: 'http://127.0.0.1:9000'
+
 rangiffler-auth:
   base-uri: 'http://127.0.0.1:9000'
 rangiffler-front:
@@ -59,3 +75,37 @@ rangiffler-countries:
   base-uri: 'http://127.0.0.1:8082'
 rangiffler-photos:
   base-uri: 'http://127.0.0.1:8083'
+---
+spring:
+  config:
+    activate:
+      on-profile: 'docker'
+  grpc:
+    client:
+      countries-service:
+        address: 'countries.rangiffler.dc:9090'
+        negotiationType: PLAINTEXT
+      userdata-service:
+        address: 'userdata.rangiffler.dc:9091'
+        negotiationType: PLAINTEXT
+      photos-service:
+        address: 'photos.rangiffler.dc:9093'
+        negotiationType: PLAINTEXT
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: 'http://auth.rangiffler.dc:9000'
+
+rangiffler-auth:
+  base-uri: 'http://auth.rangiffler.dc:9000'
+rangiffler-front:
+  base-uri: 'http://frontend.rangiffler.dc'
+rangiffler-gateway:
+  base-uri: 'http://gateway.rangiffler.dc:8080'
+rangiffler-userdata:
+  base-uri: 'http://userdata.rangiffler.dc:8081'
+rangiffler-countries:
+  base-uri: 'http://countries.rangiffler.dc:8082'
+rangiffler-photos:
+  base-uri: 'http://photos.rangiffler.dc:8083'

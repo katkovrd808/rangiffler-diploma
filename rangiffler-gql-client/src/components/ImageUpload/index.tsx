@@ -4,7 +4,7 @@ import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded';
 import "./styles.css";
 
 interface ImageUploadInterface {
-    onFileUpload: (newFile?: string) => void;
+    onFileUpload: (newFile: string) => void;
     buttonText: string;
     error: boolean;
     file?: string;
@@ -32,7 +32,11 @@ export const ImageUpload: FC<ImageUploadInterface> = ({
         reader.readAsDataURL(file);
 
         reader.onloadend = function () {
-            onFileUpload(reader.result?.toString());
+            if (reader.result) {
+                    onFileUpload(reader.result.toString());
+                } else {
+                    onFileUpload("");
+                }
         };
     };
 

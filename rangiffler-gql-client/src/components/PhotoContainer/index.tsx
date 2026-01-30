@@ -51,6 +51,7 @@ export const PhotoContainer: FC<PhotoContainerInterface> = ({
                     value: image.src,
                 }
             },
+            withFriends: withFriends
         });
     };
 

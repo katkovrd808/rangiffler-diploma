@@ -1,9 +1,10 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
+    id 'com.google.cloud.tools.jib' version '3.4.1'
 }
 
 group = 'guru.qa'
-version = 'unspecified'
+version = '1.0.0'
 
 dependencies {
     implementation project(':rangiffler-grpc-common')
@@ -29,3 +30,34 @@ dependencies {
     //TEST
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+jib {
+    container {
+        ports = ['8083']
+        jvmFlags = ["-Dspring.profiles.active=${System.env.PROFILE}"]
+        environment = [
+                'TZ'         : 'Europe/Moscow'
+        ]
+        creationTime = 'USE_CURRENT_TIMESTAMP'
+        labels = [
+                'maintainer': 'Roman Katkov @rdkatkov',
+                'version'   : "${project.version}".toString()
+        ]
+    }
+    from {
+        image = "${project.ext.dockerImage}"
+        platforms {
+            platform {
+                architecture = "${project.ext.dockerArch}"
+                os = 'linux'
+            }
+        }
+    }
+    to {
+        image = "${project.ext.dockerHubName}/${project.name}-${System.env.PROFILE}"
+        tags = ['latest', "${project.version}"]
+    }
+}
+
+tasks.jib.dependsOn test
+tasks.jibDockerBuild.dependsOn test

@@ -19,6 +19,7 @@ export const MyTravelsPage = () => {
             title: "Add photo",
             isEdit: false,
             formData: {...formInitialState,},
+            withFriends: withFriends
         });
     };
 

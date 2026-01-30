@@ -51,6 +51,7 @@ public class SecurityConfiguration {
           antMatcher("/static/**"),
           antMatcher("/webjars/**"),
           antMatcher("/graphiql/**"),
+          antMatcher("/actuator/health"),
           antMatcher(HttpMethod.POST, "/graphql"),
           antMatcher(HttpMethod.GET, "/graphql")
         ).permitAll()

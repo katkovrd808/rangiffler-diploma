@@ -31,6 +31,8 @@ allprojects {
 
 subprojects {
     ext {
+        dockerHubName = "katkovrd808"
+
         lombokVersion = '1.18.38'
         springKafkaVersion = '3.3.4'
         postgresDriverVersion = '42.7.5'
@@ -42,6 +44,13 @@ subprojects {
         h2Version = '2.3.232'
         mapStructVersion = '1.5.5.Final'
         geoip2Version = '5.0.0'
+
+        dockerImage = System.getProperty("os.arch") == "aarch64" || System.getProperty("os.arch") == "arm64"
+                ? "arm64v8/eclipse-temurin:21-jdk"
+                : "eclipse-temurin:21-jdk"
+        dockerArch = System.getProperty("os.arch") == "aarch64" || System.getProperty("os.arch") == "arm64"
+                ? "arm64"
+                : "amd64"
     }
 
     tasks.withType(Test).configureEach {

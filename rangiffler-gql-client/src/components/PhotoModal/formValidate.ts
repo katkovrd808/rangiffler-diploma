@@ -7,23 +7,33 @@ export interface IStringIndex extends Record<string, any> {
 };
 
 export type PhotoFormProps = {
+    [key: string]: {
+        value: string | undefined;
+        error: boolean;
+        errorMessage: string;
+    } | string | undefined;
+
     description: {
-        value: string,
-        error: boolean,
-        errorMessage: string,
-    },
+        value: string;
+        error: boolean;
+        errorMessage: string;
+    };
     country: {
-        value: string,
-        error: boolean,
-        errorMessage: string,
-    },
+        value: string;
+        error: boolean;
+        errorMessage: string;
+    };
     src: {
-        value?: string,
-        error: boolean,
-        errorMessage: string,
-    },
-    id?: string,
-}
+        value: string;
+        error: boolean;
+        errorMessage: string;
+    };
+    id?: string;
+};
+
+export const isFormField = (key: string, _obj: PhotoFormProps): key is 'description' | 'country' | 'src' => {
+    return ['description', 'country', 'src'].includes(key);
+};
 
 export const formInitialState: PhotoFormProps = {
     description: {
@@ -37,7 +47,7 @@ export const formInitialState: PhotoFormProps = {
         errorMessage: "",
     },
     src: {
-        value: undefined,
+        value: "",
         error: false,
         errorMessage: "",
     }
@@ -45,31 +55,56 @@ export const formInitialState: PhotoFormProps = {
 
 
 export const formValidate = (formValues: PhotoFormProps): PhotoFormProps => {
-    let newFormValues = {...formValues};
+    let newFormValues = { ...formValues };
 
-    newFormValues = {
-        ...newFormValues,
-        description: {
-            ...newFormValues.description,
-            error: formValues.description.value?.length > MAX_PHOTO_DESCRIPTION_LENGTH ? true : false,
-            errorMessage: formValues.description.value?.length > MAX_PHOTO_DESCRIPTION_LENGTH ? MAX_PHOTO_DESCRIPTION_ERROR : "",
-        },
-        src: {
-            ...newFormValues.src,
-            error: !Boolean(formValues.src.value) ? true : false,
-            errorMessage: !Boolean(formValues.src.value) ? EMPTY_SRC_ERROR : "",
-        },
-        country: {
-            ...newFormValues.country,
-            error: !Boolean(formValues.country.value) ? true : false,
-            errorMessage: !Boolean(formValues.country.value) ? EMPTY_COUNTRY_ERROR : "",
-        }
-    }
+    const fieldsToValidate = ['description', 'src', 'country'] as const;
 
-    return newFormValues;
+    fieldsToValidate.forEach(field => {
+            if (field in newFormValues) {
+                const fieldValue = newFormValues[field];
+
+                if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
+                    let error = false;
+                    let errorMessage = "";
+
+                    switch (field) {
+                        case 'description':
+                            error = fieldValue.value?.length > MAX_PHOTO_DESCRIPTION_LENGTH;
+                            errorMessage = error ? MAX_PHOTO_DESCRIPTION_ERROR : "";
+                            break;
+                        case 'src':
+                            error = !Boolean(fieldValue.value);
+                            errorMessage = error ? EMPTY_SRC_ERROR : "";
+                            break;
+                        case 'country':
+                            error = !Boolean(fieldValue.value);
+                            errorMessage = error ? EMPTY_COUNTRY_ERROR : "";
+                            break;
+                    }
+
+                    newFormValues = {
+                        ...newFormValues,
+                        [field]: {
+                            ...fieldValue,
+                            error,
+                            errorMessage
+                        }
+                    };
+                }
+            }
+        });
+
+        return newFormValues;
 };
 
 export const formHasErrors = (formValues: Record<string, any>) => {
-    const keys = Object.keys(formValues);
-    return keys.some((key) => formValues[key].error === true);
+    const formFields = ['description', 'src', 'country'] as const;
+
+        return formFields.some((field) => {
+            const fieldValue = formValues[field];
+            return fieldValue &&
+                   typeof fieldValue === 'object' &&
+                   'error' in fieldValue &&
+                   fieldValue.error === true;
+        });
 };

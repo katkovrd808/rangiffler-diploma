@@ -58,11 +58,11 @@ public class UserQueryControllerTest {
     final UsersSliceGql expectedUsersSlice = new UsersSliceGql(null, null);
 
     when(jwt.getClaim("sub")).thenReturn(username);
-    when(userService.allUsers(PageRequest.of(page, size), username)).thenReturn(expectedUsersSlice);
+    when(userService.allUsers(PageRequest.of(page, size), username, null)).thenReturn(expectedUsersSlice);
 
-    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page);
+    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page, null);
 
-    verify(userService).allUsers(PageRequest.of(page, size), username);
+    verify(userService).allUsers(PageRequest.of(page, size), username, null);
     assertEquals(expectedUsersSlice, actualUsersSlice);
   }
 
@@ -167,7 +167,6 @@ public class UserQueryControllerTest {
 
   @Test
   void user_WithNullJwt_ShouldThrowException() {
-    // Контроллер ожидает аутентифицированного пользователя, Jwt не может быть null
     assertThrows(NullPointerException.class, () ->
       userQueryController.user(null)
     );
@@ -175,7 +174,6 @@ public class UserQueryControllerTest {
 
   @Test
   void user_WithNullUsernameInJwt_ShouldReturnUserFromService() {
-    // Service может обработать null username
     final UserGql expectedUser = UserGql.userWithId(UUID.randomUUID().toString());
 
     when(jwt.getClaim("sub")).thenReturn(null);
@@ -193,7 +191,7 @@ public class UserQueryControllerTest {
     final int size = 10;
 
     assertThrows(NullPointerException.class, () ->
-      userQueryController.users(null, size, page)
+      userQueryController.users(null, size, page, null)
     );
   }
 
@@ -204,11 +202,11 @@ public class UserQueryControllerTest {
     final UsersSliceGql expectedUsersSlice = new UsersSliceGql(null, null);
 
     when(jwt.getClaim("sub")).thenReturn(null);
-    when(userService.allUsers(PageRequest.of(page, size), null)).thenReturn(expectedUsersSlice);
+    when(userService.allUsers(PageRequest.of(page, size), null, null)).thenReturn(expectedUsersSlice);
 
-    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page);
+    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page, null);
 
-    verify(userService).allUsers(PageRequest.of(page, size), null);
+    verify(userService).allUsers(PageRequest.of(page, size), null, null);
     assertEquals(expectedUsersSlice, actualUsersSlice);
   }
 
@@ -220,9 +218,8 @@ public class UserQueryControllerTest {
 
     when(jwt.getClaim("sub")).thenReturn(username);
 
-    // PageRequest.of с отрицательной страницей выбрасывает IllegalArgumentException
     assertThrows(IllegalArgumentException.class, () ->
-      userQueryController.users(jwt, size, page)
+      userQueryController.users(jwt, size, page, null)
     );
   }
 
@@ -234,9 +231,8 @@ public class UserQueryControllerTest {
 
     when(jwt.getClaim("sub")).thenReturn(username);
 
-    // PageRequest.of с size=0 выбрасывает IllegalArgumentException
     assertThrows(IllegalArgumentException.class, () ->
-      userQueryController.users(jwt, size, page)
+      userQueryController.users(jwt, size, page, null)
     );
   }
 
@@ -247,7 +243,6 @@ public class UserQueryControllerTest {
     final int size = 10;
     final String searchQuery = "test";
 
-    // PageRequest.of с отрицательной страницей выбрасывает IllegalArgumentException
     assertThrows(IllegalArgumentException.class, () ->
       userQueryController.friends(user, page, size, searchQuery)
     );
@@ -260,7 +255,6 @@ public class UserQueryControllerTest {
     final int size = 0;
     final String searchQuery = "test";
 
-    // PageRequest.of с size=0 выбрасывает IllegalArgumentException
     assertThrows(IllegalArgumentException.class, () ->
       userQueryController.incomeInvitations(user, page, size, searchQuery)
     );
@@ -322,11 +316,11 @@ public class UserQueryControllerTest {
     final UsersSliceGql expectedUsersSlice = new UsersSliceGql(null, null);
 
     when(jwt.getClaim("sub")).thenReturn(username);
-    when(userService.allUsers(PageRequest.of(page, size), username)).thenReturn(expectedUsersSlice);
+    when(userService.allUsers(PageRequest.of(page, size), username, null)).thenReturn(expectedUsersSlice);
 
-    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page);
+    final UsersSliceGql actualUsersSlice = userQueryController.users(jwt, size, page, null);
 
-    verify(userService).allUsers(PageRequest.of(page, size), username);
+    verify(userService).allUsers(PageRequest.of(page, size), username, null);
     assertEquals(expectedUsersSlice, actualUsersSlice);
   }
 

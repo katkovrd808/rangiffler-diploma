@@ -1,0 +1,35 @@
+#!/bin/bash
+
+source ./docker.properties
+export PROFILE=docker
+export PREFIX="${IMAGE_PREFIX}"
+
+docker compose down
+docker_containers=$(docker ps -a -q)
+docker_images=$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rangiffler')
+
+if [ ! -z "$docker_containers" ]; then
+  echo "### Stop containers: $docker_containers ###"
+  docker stop $docker_containers
+  docker rm $docker_containers
+fi
+
+if [ ! -z "$docker_images" ]; then
+  echo "### Remove images: $docker_images ###"
+  docker rmi $docker_images
+fi
+
+echo '### Java version ###'
+java --version
+bash ./gradlew clean
+if [ "$1" = "push" ]; then
+  echo "### Build & push images ###"
+  bash ./gradlew jib -x :rangiffler-e2e-tests:test -Duser.timezone=UTC
+  docker compose push frontend.rangiffler.dc
+else
+  echo "### Build images ###"
+  bash ./gradlew jibDockerBuild -x :rangiffler-e2e-tests:test -Duser.timezone=UTC
+fi
+
+docker compose up -d --build
+docker ps -a

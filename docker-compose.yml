@@ -1,0 +1,157 @@
+services:
+  rangiffler-all-db:
+    container_name: rangiffler-all-db
+    image: postgres:15.1
+    environment:
+      - CREATE_DATABASES=rangiffler-auth,rangiffler-photos,rangiffler-countries,rangiffler-userdata
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=secret
+      - TZ=GMT+3
+      - PGTZ=GMT+3
+    volumes:
+      - ./postgres/script:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    ports:
+      - 5432:5432
+    command: [ "postgres", "-c", "max_prepared_transactions=100" ]
+    networks:
+      - rangiffler-network
+
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.3.2
+    ports:
+      - 2181:2181
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+    networks:
+      - rangiffler-network
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.3.2
+    ports:
+      - 9092:9092
+    depends_on:
+      zookeeper:
+        condition: service_started
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+    networks:
+      - rangiffler-network
+
+  auth.rangiffler.dc:
+    container_name: auth.rangiffler.dc
+    image: ${PREFIX}/rangiffler-auth-docker:latest
+    ports:
+      - 9000:9000
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:InitialHeapSize=512m -XX:MaxHeapSize=768m
+    healthcheck:
+      test: "wget --spider http://localhost:9000/actuator/health || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    depends_on:
+      rangiffler-all-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - rangiffler-network
+
+  countries.rangiffler.dc:
+    container_name: countries.rangiffler.dc
+    image: ${PREFIX}/rangiffler-countries-docker:latest
+    ports:
+      - 8082:8082
+      - 9090:9090
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:InitialHeapSize=384m -XX:MaxHeapSize=512m
+    restart: always
+    depends_on:
+      rangiffler-all-db:
+        condition: service_healthy
+    networks:
+      - rangiffler-network
+
+  userdata.rangiffler.dc:
+    container_name: userdata.rangiffler.dc
+    image: ${PREFIX}/rangiffler-userdata-docker:latest
+    ports:
+      - 8081:8081
+      - 9091:9091
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:InitialHeapSize=384m -XX:MaxHeapSize=512m
+    restart: always
+    depends_on:
+      auth.rangiffler.dc:
+        condition: service_healthy
+      rangiffler-all-db:
+        condition: service_healthy
+    networks:
+      - rangiffler-network
+  
+  photos.rangiffler.dc:
+    container_name: photos.rangiffler.dc
+    image: ${PREFIX}/rangiffler-photos-docker:latest
+    ports:
+      - 8083:8083
+      - 9093:9093
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:InitialHeapSize=384m -XX:MaxHeapSize=512m
+    restart: always
+    depends_on:
+      rangiffler-all-db:
+        condition: service_healthy
+    networks:
+      - rangiffler-network
+  
+  gateway.rangiffler.dc:
+    container_name: gateway.rangiffler.dc
+    image: ${PREFIX}/rangiffler-gateway-docker:latest
+    ports:
+      - 8080:8080
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:InitialHeapSize=384m -XX:MaxHeapSize=512m
+    healthcheck:
+      test: "wget --spider http://localhost:8090/actuator/health || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    depends_on:
+      auth.rangiffler.dc:
+        condition: service_healthy
+    networks:
+      - rangiffler-network
+  
+  frontend.rangiffler.dc:
+    container_name: frontend.rangiffler.dc
+    image: ${PREFIX}/rangiffler-gql-client-docker:latest
+    build:
+      context: ./rangiffler-gql-client
+      dockerfile: ./Dockerfile
+      args:
+        NPM_COMMAND: build:docker
+    ports:
+      - 80:80
+    depends_on:
+      gateway.rangiffler.dc:
+        condition: service_started
+    networks:
+      - rangiffler-network
+
+networks:
+  rangiffler-network:
+    driver: bridge

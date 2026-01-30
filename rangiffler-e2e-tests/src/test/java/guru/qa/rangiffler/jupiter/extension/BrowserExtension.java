@@ -13,12 +13,14 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@ParametersAreNonnullByDefault
 public class BrowserExtension implements
   BeforeEachCallback,
   AfterEachCallback,

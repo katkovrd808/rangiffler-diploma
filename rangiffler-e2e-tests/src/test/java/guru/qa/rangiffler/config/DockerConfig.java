@@ -10,13 +10,13 @@ enum DockerConfig implements Config {
   @NotNull
   @Override
   public String frontUrl() {
-    return "http://rangiffler.frontend.dc";
+    return "http://frontend.rangiffler.dc/";
   }
 
   @NotNull
   @Override
   public String authUrl() {
-    return "http://auth.rangiffler.dc:9000";
+    return "http://auth.rangiffler.dc:9000/";
   }
 
   @NotNull

@@ -115,6 +115,7 @@ public class FriendTest {
     incomeInvitations = 1
   )
   @ApiLogin
+  @DisplayName("User should be able to create friendship request from All People page")
   void userShouldBeAbleToCreateFriendshipRequestFromAllPeopleTable(UdUserJson user) {
     final String inviterUsername = user.testData().incomeInvitations().getFirst().username();
 

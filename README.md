@@ -34,6 +34,12 @@
 - Docker
 - Docker-compose
 
+## JUnit Extensions
+Тесты используют функционал JUnit Extensions для менеджмента тестовых данных. На данный момент реализованы следующие экстеншены:
+1. `ApiLoginExtension` - реализует логику получения JWT токена, сохранения его в ThreadLocalCookieStore и использования в тесте.
+2. `UserExtension` - реализует логику регистрации нового пользователя или использования существующего, а также наполнения тестового пользователя данными.
+3. `PhotoExtension` - реализует логику создания фото с передаваемыми параметрами.
+
 # Локальный запуск приложения
 Для корректной локальной работы сервиса первоначально необходимо установить Docker Images. Сделать это можно с помощью следующих команд:
 ```posh
@@ -118,9 +124,22 @@ c69bc5ce7786   katkovrd808/rangiffler-countries-docker:latest    "java -Dspring.
 78d751cee86f   confluentinc/cp-zookeeper:7.3.2                   "/etc/confluent/dock…"   14 seconds ago   Up 14 seconds                              0.0.0.0:2181->2181/tcp, [::]:2181->2181/tcp                                                zookeeper
 c75f89931d66   postgres:15.1                                     "docker-entrypoint.s…"   14 seconds ago   Up 14 seconds (healthy)                    0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp                                                rangiffler-all-db
 ```
-После запуска сервисов вы можете перейти по ссылке http://frontend.rangiffler.dc и начать работу с сервисом.
+После запуска сервисов вы можете открыть fronted по ссылке, указанной ниже, и начать работу с сервисом.
+
+Fronted сервиса Rangiffler (в Docker): http://frontend.rangiffler.dc
 
 ## Запуск E2E тестов в Docker
+Для запуска тестов реализован bash скрипт `docker-compose-e2e.sh`, который располагается в корневой папке проекта.
+Скрипт может быть запущен с помощью команды в терминале:
+```posh
+rangiffler-diploma % bash docker-compose-e2e.sh
+```
+
+В результате выполнения скрипта будут собраны бэкенды сервиса в Docker, а также выполнены e2e тесты.
+
+Результаты e2e тестов можно найти по ссылке (в Docker): http://allure:5252/
 
 # Результаты E2E тестирования
+
+В будущем ожидается увеличение покрытия и реализация API тестов для graphQL и gRPC.
 <img src="img/test-results.png" width="600">

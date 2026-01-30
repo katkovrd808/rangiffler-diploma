@@ -91,7 +91,7 @@ rangiffler-diploma % bash localenv-stop.sh
 ## Сборка Dev окружения
 #### Перед началом работы с Docker, в первую очередь необходимо создать учетную запись в Docker Hub, если у вас ее еще нет. 
 
-Для корректной работы сервиса в Docker, необходимо прописать алиасы сервисов в файле `ets/hosts`.
+Для корректной работы сервиса в Docker, необходимо прописать алиасы сервисов в файле `etc/hosts`.
 ```posh
 # Rangiffler services
 127.0.0.1 frontend.rangiffler.dc

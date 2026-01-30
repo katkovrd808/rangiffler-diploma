@@ -106,6 +106,7 @@ rangiffler-diploma % bash localenv-stop.sh
 127.0.0.1 userdata.rangiffler.dc
 127.0.0.1 photos.rangiffler.dc
 127.0.0.1 countries.rangiffler.dc
+127.0.0.1 allure
 ```
 Далее необходимо запустить скрипт `docker-compose-dev.sh`. В ходе запуска сервисов будут выполнены unit-тест и в случае обнаружения
 багов, сборка будет отменена и потребуется их исправление. 
@@ -129,6 +130,13 @@ c75f89931d66   postgres:15.1                                     "docker-entrypo
 Fronted сервиса Rangiffler (в Docker): http://frontend.rangiffler.dc
 
 ## Запуск E2E тестов в Docker
+Перед запуском тестов необходимо создать docker volume, который будет хранить в себе результаты тестов.
+Сделать это можно с помощью следующей команды:
+```posh
+rangiffler-diploma % docker volume create allure-results
+```
+После этого вы можете переходить к следующему шагу.
+
 Для запуска тестов реализован bash скрипт `docker-compose-e2e.sh`, который располагается в корневой папке проекта.
 Скрипт может быть запущен с помощью команды в терминале:
 ```posh

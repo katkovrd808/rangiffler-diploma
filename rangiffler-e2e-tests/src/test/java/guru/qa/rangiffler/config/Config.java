@@ -11,10 +11,12 @@ public interface Config {
       : LocalConfig.INSTANCE;
   }
 
+  @Nonnull
   default String testDatabaseUsername() {
     return "postgres";
   }
 
+  @Nonnull
   default String testDatabasePassword() {
     return "secret";
   }
@@ -31,6 +33,7 @@ public interface Config {
   @Nonnull
   String countriesGrpcAddress();
 
+  @Nonnull
   default int countriesGrpcPort() {
     return 9090;
   }
@@ -41,6 +44,7 @@ public interface Config {
   @Nonnull
   String userdataGrpcAddress();
 
+  @Nonnull
   default int userdataGrpcPort() {
     return 9091;
   }
@@ -51,6 +55,7 @@ public interface Config {
   @Nonnull
   String photosGrpcAddress();
 
+  @Nonnull
   default int photosGrpcPort() {
     return 9093;
   }
@@ -58,7 +63,11 @@ public interface Config {
   @Nonnull
   String photosJdbcUrl();
 
+  @Nonnull
   default String gatewayUrl() {
     return "http://127.0.0.1:8080/graphql";
   };
+
+  @Nonnull
+  String allureDockerUrl();
 }

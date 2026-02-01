@@ -7,8 +7,10 @@ import guru.qa.rangiffler.data.entity.auth.AuthorityEntity;
 import guru.qa.rangiffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.rangiffler.data.entity.userdata.UdUserEntity;
 import guru.qa.rangiffler.data.repository.AuthUserRepository;
+import guru.qa.rangiffler.data.repository.CountriesRepository;
 import guru.qa.rangiffler.data.repository.UserdataUserRepository;
 import guru.qa.rangiffler.data.repository.impl.AuthUserRepositoryHibernate;
+import guru.qa.rangiffler.data.repository.impl.CountriesRepositoryHibernate;
 import guru.qa.rangiffler.data.repository.impl.UserdataUserRepositoryHibernate;
 import guru.qa.rangiffler.data.tpl.XaTransactionTemplate;
 import guru.qa.rangiffler.model.UdUserJson;
@@ -28,10 +30,11 @@ public class UsersDbClient implements UsersClient {
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-  private static final String DEFAULT_COUNTRY_ID = "9415a235-6d91-484e-a92a-afa68c55bcb2";
+  private static final String DEFAULT_COUNTRY_CODE = "RU";
 
   private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
   private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositoryHibernate();
+  private final CountriesRepository countriesRepository = new CountriesRepositoryHibernate();
 
   private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
     CFG.authJdbcUrl(),
@@ -149,9 +152,13 @@ public class UsersDbClient implements UsersClient {
 
   @Nonnull
   private UdUserEntity userEntity(String username) {
+    final UUID defaultCountryId = countriesRepository.findByCode(DEFAULT_COUNTRY_CODE)
+      .orElseThrow()
+      .getId();
+
     UdUserEntity ue = new UdUserEntity();
     ue.setUsername(username);
-    ue.setCountryId(UUID.fromString(DEFAULT_COUNTRY_ID));
+    ue.setCountryId(defaultCountryId);
     return ue;
   }
 

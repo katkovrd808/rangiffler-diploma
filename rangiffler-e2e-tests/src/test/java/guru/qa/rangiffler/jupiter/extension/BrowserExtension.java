@@ -6,8 +6,6 @@ import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Allure;
 import io.qameta.allure.selenide.AllureSelenide;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.extension.*;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -15,10 +13,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
-import java.lang.reflect.AnnotatedElement;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 public class BrowserExtension implements
@@ -27,31 +21,23 @@ public class BrowserExtension implements
   TestExecutionExceptionHandler,
   LifecycleMethodExecutionExceptionHandler {
 
-  private final static Set<String> REQUIRED_TAGS = Set.of("WEB");
-
   static {
     Configuration.browser = "chrome";
+    Configuration.timeout = 8000;
     Configuration.pageLoadStrategy = "eager";
     if ("docker".equals(System.getProperty("test.env"))) {
       Configuration.remote = "http://selenoid:4444/wd/hub";
       Configuration.browserVersion = "135.0";
-      Configuration.browserCapabilities = new ChromeOptions()
-        .addArguments("--no-sandbox")
-        .addArguments("--disable-dev-shm-usage");
+      Configuration.browserCapabilities = new ChromeOptions().addArguments("--no-sandbox");
     }
   }
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    context.getElement()
-      .map(this::extractTags)
-      .filter(tags -> tags.stream().anyMatch(REQUIRED_TAGS::contains))
-      .ifPresent(tags ->
-        SelenideLogger.addListener("Allure-selenide", new AllureSelenide()
-          .savePageSource(false)
-          .screenshots(false)
-        )
-      );
+    SelenideLogger.addListener("Allure-selenide", new AllureSelenide()
+      .savePageSource(false)
+      .screenshots(false)
+    );
   }
 
   @Override
@@ -88,22 +74,5 @@ public class BrowserExtension implements
         )
       );
     }
-  }
-
-  private Set<String> extractTags(AnnotatedElement element) {
-    Set<String> singleTags = Arrays.stream(element.getAnnotationsByType(Tag.class))
-      .map(Tag::value)
-      .collect(Collectors.toSet());
-
-    Set<String> multipleTags = Arrays.stream(element.getAnnotationsByType(Tags.class))
-      .flatMap(tags -> Arrays.stream(tags.value()))
-      .map(Tag::value)
-      .collect(Collectors.toSet());
-
-    return Set.copyOf(
-      Arrays.asList(singleTags, multipleTags).stream()
-        .flatMap(Set::stream)
-        .collect(Collectors.toSet())
-    );
   }
 }

@@ -3,6 +3,7 @@ package guru.qa.rangiffler.test.web;
 import guru.qa.rangiffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.rangiffler.jupiter.annotation.ApiLogin;
 import guru.qa.rangiffler.jupiter.annotation.User;
+import guru.qa.rangiffler.jupiter.annotation.meta.WebTest;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.page.PeoplePage;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.sleep;
 
 @Tags({@Tag("WEB")})
+@WebTest
 @ParametersAreNonnullByDefault
 public class FriendTest {
   @Test

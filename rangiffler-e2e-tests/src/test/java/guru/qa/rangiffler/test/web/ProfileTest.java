@@ -2,9 +2,13 @@ package guru.qa.rangiffler.test.web;
 
 import guru.qa.rangiffler.jupiter.annotation.ApiLogin;
 import guru.qa.rangiffler.jupiter.annotation.User;
+import guru.qa.rangiffler.jupiter.annotation.meta.WebTest;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.page.ProfilePage;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
+import org.junit.jupiter.api.Test;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -13,6 +17,7 @@ import static guru.qa.rangiffler.utils.RandomDataUtils.randomName;
 import static guru.qa.rangiffler.utils.RandomDataUtils.randomSurname;
 
 @Tags({@Tag("WEB")})
+@WebTest
 @ParametersAreNonnullByDefault
 public class ProfileTest {
   @Test

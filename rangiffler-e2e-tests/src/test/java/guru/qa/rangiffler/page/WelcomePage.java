@@ -1,6 +1,7 @@
 package guru.qa.rangiffler.page;
 
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.rangiffler.config.Config;
 import guru.qa.rangiffler.page.base.BasePage;
 import io.qameta.allure.Step;
 
@@ -12,6 +13,9 @@ import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
 public class WelcomePage extends BasePage<WelcomePage> {
+
+  public static final String URL = Config.getInstance().frontUrl();
+
   private final SelenideElement
     loginBtn = $("#root button"),
     registrationBtn = $("#root a");

@@ -2,6 +2,7 @@ package guru.qa.rangiffler.test.web;
 
 import guru.qa.rangiffler.jupiter.annotation.ApiLogin;
 import guru.qa.rangiffler.jupiter.annotation.User;
+import guru.qa.rangiffler.jupiter.annotation.meta.WebTest;
 import guru.qa.rangiffler.page.PhotoPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -11,9 +12,11 @@ import org.junit.jupiter.api.Test;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.codeborne.selenide.Selenide.open;
-import static guru.qa.rangiffler.utils.RandomDataUtils.*;
+import static guru.qa.rangiffler.utils.RandomDataUtils.randomLongPhotoDescription;
+import static guru.qa.rangiffler.utils.RandomDataUtils.randomPhotoDescription;
 
 @Tags({@Tag("WEB")})
+@WebTest
 @ParametersAreNonnullByDefault
 public class PhotoTest {
 

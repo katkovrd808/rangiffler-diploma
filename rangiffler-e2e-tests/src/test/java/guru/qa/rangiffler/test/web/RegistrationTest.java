@@ -1,6 +1,7 @@
 package guru.qa.rangiffler.test.web;
 
 import com.github.javafaker.Faker;
+import guru.qa.rangiffler.jupiter.annotation.meta.WebTest;
 import guru.qa.rangiffler.page.RegistrationPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -13,10 +14,11 @@ import static com.codeborne.selenide.Selenide.open;
 import static guru.qa.rangiffler.utils.RandomDataUtils.randomUsername;
 
 @Tags({@Tag("WEB")})
+@WebTest
 @ParametersAreNonnullByDefault
 public class RegistrationTest {
   private final Faker faker = new Faker();
-  private static final String DEFAULT_PASSWORD = "12345";
+  private static final String DEFAULT_PASSWORD = "secret";
 
   @Test
   @DisplayName("User should be registered with valid username and password")

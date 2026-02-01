@@ -10,6 +10,7 @@ import guru.qa.rangiffler.model.TestData;
 import guru.qa.rangiffler.model.UdUserJson;
 import guru.qa.rangiffler.page.PhotoPage;
 import guru.qa.rangiffler.service.impl.api.AuthApiClient;
+import io.qameta.allure.Step;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
@@ -38,6 +39,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
   }
 
   @Override
+  @Step("Authorizing user with ApiLoginExtension")
   public void beforeEach(ExtensionContext context) throws Exception {
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), ApiLogin.class)
       .ifPresent(apiLogin -> {

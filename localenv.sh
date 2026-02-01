@@ -86,4 +86,4 @@ wait_for_service "127.0.0.1" "8082" "Countries"
 wait_for_service "127.0.0.1" "8083" "Photos"
 
 ./gradlew rangiffler-gateway:bootRun -Dspring.profiles.active=local
-wait_for_service "127.0.0.1" "8080" "Gateway"
+wait_for_service "127.0.0.1" "8089" "Gateway"

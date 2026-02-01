@@ -64,14 +64,6 @@ spring:
   config:
     activate:
       on-profile: 'local'
-  grpc:
-    client:
-      countries-service:
-        address: 'http://127.0.0.1:9090'
-        negotiationType: PLAINTEXT
-      userdata-service:
-        address: 'http://127.0.0.1:9091'
-        negotiationType: PLAINTEXT
   datasource:
     url: 'jdbc:postgresql://127.0.0.1:5432/rangiffler-photos'
     username: postgres

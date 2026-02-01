@@ -31,12 +31,13 @@ public class BrowserExtension implements
 
   static {
     Configuration.browser = "chrome";
-    Configuration.timeout = 8000;
     Configuration.pageLoadStrategy = "eager";
     if ("docker".equals(System.getProperty("test.env"))) {
       Configuration.remote = "http://selenoid:4444/wd/hub";
-      Configuration.browserVersion = "127.0";
-      Configuration.browserCapabilities = new ChromeOptions().addArguments("--no-sandbox");
+      Configuration.browserVersion = "135.0";
+      Configuration.browserCapabilities = new ChromeOptions()
+        .addArguments("--no-sandbox")
+        .addArguments("--disable-dev-shm-usage");
     }
   }
 

@@ -1,7 +1,8 @@
 package guru.qa.rangiffler.config;
 
 import guru.qa.rangiffler.grpc.RangifflerCountriesServiceGrpc;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,10 @@ public class GrpcClientsConfiguration {
   public RangifflerCountriesServiceGrpc.RangifflerCountriesServiceBlockingStub rangifflerCountriesServiceBlockingStub(
     GrpcChannelFactory grpcChannelFactory
   ) {
-    Channel channel = grpcChannelFactory.createChannel("countries-service");
+    ManagedChannel channel = ManagedChannelBuilder
+      .forAddress("127.0.0.1", 9099)
+      .usePlaintext()
+      .build();
     return RangifflerCountriesServiceGrpc.newBlockingStub(channel)
       .withMaxInboundMessageSize(1024 * 1024);
   }

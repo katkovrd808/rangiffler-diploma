@@ -3,7 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/rangiffler-diploma.iml" filepath="$PROJECT_DIR$/.idea/rangiffler-diploma.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-auth/rangiffler-diploma.rangiffler-auth.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-countries/rangiffler-diploma.rangiffler-countries.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-gateway/rangiffler-diploma.rangiffler-gateway.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-photos/rangiffler-diploma.rangiffler-photos.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rangiffler-userdata/rangiffler-diploma.rangiffler-userdata.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rangiffler-userdata/rangiffler-diploma.rangiffler-userdata.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/rangiffler-e2e-tests.iml" filepath="$PROJECT_DIR$/rangiffler-e2e-tests.iml" />
     </modules>
   </component>

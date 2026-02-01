@@ -37,7 +37,7 @@ dependencies {
 
 jib {
     container {
-        ports = ['8080']
+        ports = ['8089']
         jvmFlags = ["-Dspring.profiles.active=${System.env.PROFILE}"]
         environment = [
                 'TZ'         : 'Europe/Moscow'

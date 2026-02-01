@@ -21,7 +21,7 @@ public class GrpcClientsDockerConfiguration {
     GrpcChannelFactory grpcChannelFactory
   ) {
     ManagedChannel channel = ManagedChannelBuilder
-      .forAddress("countries.rangiffler.dc", 9090)
+      .forAddress("countries.rangiffler.dc", 9099)
       .usePlaintext()
       .build();
     return RangifflerCountriesServiceGrpc.newBlockingStub(channel)

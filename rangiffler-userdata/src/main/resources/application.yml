@@ -66,11 +66,6 @@ spring:
   config:
     activate:
       on-profile: 'local'
-  grpc:
-    client:
-      countries-service:
-        address: '127.0.0.1:9090'
-        negotiationType: PLAINTEXT
   kafka:
     bootstrap-servers: 'localhost:9092'
     consumer:

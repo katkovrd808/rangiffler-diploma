@@ -35,7 +35,7 @@ public interface Config {
 
   @Nonnull
   default int countriesGrpcPort() {
-    return 9090;
+    return 9099;
   }
 
   @Nonnull
@@ -65,7 +65,7 @@ public interface Config {
 
   @Nonnull
   default String gatewayUrl() {
-    return "http://127.0.0.1:8080/graphql";
+    return "http://127.0.0.1:8089/graphql";
   };
 
   @Nonnull

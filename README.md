@@ -107,6 +107,7 @@ rangiffler-diploma % bash localenv-stop.sh
 127.0.0.1 photos.rangiffler.dc
 127.0.0.1 countries.rangiffler.dc
 127.0.0.1 allure
+127.0.0.1 selenoid
 ```
 Далее необходимо запустить скрипт `docker-compose-dev.sh`. В ходе запуска сервисов будут выполнены unit-тест и в случае обнаружения
 багов, сборка будет отменена и потребуется их исправление. 
